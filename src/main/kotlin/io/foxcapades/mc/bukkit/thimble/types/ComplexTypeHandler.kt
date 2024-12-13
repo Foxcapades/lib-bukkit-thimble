@@ -11,5 +11,5 @@ interface ComplexTypeHandler<T : Any> : TypeHandler<T> {
   @Throws(ThimbleException::class)
   fun serializeNull(writer: ValueWriter) = writer.writeNull()
 
-  override fun deserializerFor(version: Int): ComplexDeserializer<out T>?
+  override fun deserializerFor(version: Byte): ComplexDeserializer<out T>?
 }

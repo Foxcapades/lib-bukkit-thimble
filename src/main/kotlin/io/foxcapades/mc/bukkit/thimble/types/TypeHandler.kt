@@ -5,10 +5,10 @@ import io.foxcapades.mc.bukkit.thimble.parse.ThimbleDeserializer
 sealed interface TypeHandler<D : Any> {
   val typeIndicator: String
 
-  val currentVersion: Int
+  val currentVersion: Byte
 
-  val actualType: Class<D>
+  val actualType: Class<out D>
 
-  fun deserializerFor(version: Int): ThimbleDeserializer<out D>?
+  fun deserializerFor(version: Byte): ThimbleDeserializer<out D>?
 }
 

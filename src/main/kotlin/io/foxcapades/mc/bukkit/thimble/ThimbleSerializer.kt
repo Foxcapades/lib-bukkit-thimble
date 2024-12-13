@@ -91,9 +91,9 @@ class ThimbleSerializer @JvmOverloads constructor(private val registry: TypeHand
 
   private fun JsonWriter.serializeSimple(value: Any, handler: SimpleTypeHandler<*, Any>) {
     withType(handler) {
-      if (it is SpecialTypeHandler<*>) {
+      if (it is RawTypeSerializer<*>) {
         @Suppress("UNCHECKED_CAST")
-        jsonValue((it as SpecialTypeHandler<Any>).serializeToRaw(value))
+        jsonValue((it as RawTypeSerializer<Any>).serializeToRaw(value))
         return
       }
 

@@ -92,8 +92,8 @@ internal class ValueWriterImpl(
     when (val handler = registry.requireTypeHandlerFor(value::class.java)) {
       is SimpleTypeHandler<*, *> ->
         writer.withType(handler as SimpleTypeHandler<*, Any>) {
-          if (it is SpecialTypeHandler<*>)
-            jsonValue((handler as SpecialTypeHandler<Any>).serializeToRaw(value))
+          if (it is RawTypeSerializer<*>)
+            jsonValue((handler as RawTypeSerializer<Any>).serializeToRaw(value))
           else
             simpleValue(it.serialize(value), value::class.java)
         }
@@ -168,7 +168,7 @@ internal class ValueWriterImpl(
   private inline fun <reified T : Any> write(value: T) {
     @Suppress("UNCHECKED_CAST")
     when (val handler = registry.requireTypeHandlerFor(T::class.java)) {
-      is SpecialTypeHandler<*>   -> writer.jsonValue((handler as SpecialTypeHandler<Any>).serializeToRaw(value))
+      is RawTypeSerializer<*>   -> writer.jsonValue((handler as RawTypeSerializer<Any>).serializeToRaw(value))
       is SimpleTypeHandler<*, T> -> writer.simpleValue(handler.serialize(value), T::class.java)
       is ComplexTypeHandler<T>   -> writer.complexValue(value, this@ValueWriterImpl, handler)
       else -> throw IllegalStateException()

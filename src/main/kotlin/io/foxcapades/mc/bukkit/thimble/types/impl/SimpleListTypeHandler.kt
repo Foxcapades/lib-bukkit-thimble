@@ -6,10 +6,10 @@ import io.foxcapades.mc.bukkit.thimble.types.ListTypeHandler
 import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
 
 abstract class SimpleListTypeHandler<T : Any> : ListTypeHandler<T> {
-  override val currentVersion: Int
+  override val currentVersion: Byte
     get() = 1
 
-  override fun deserializerFor(version: Int): ComplexDeserializer<out List<T>>? =
+  override fun deserializerFor(version: Byte): ComplexDeserializer<out List<T>>? =
     SimpleListDeserializer(::readValue)
 
   override fun serialize(value: List<T>, writer: ValueWriter) {

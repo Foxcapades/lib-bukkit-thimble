@@ -2,7 +2,9 @@ package io.foxcapades.mc.bukkit.thimble.types
 
 import io.foxcapades.mc.bukkit.thimble.ThimbleException
 import io.foxcapades.mc.bukkit.thimble.ThimbleSerializationException
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.*
 import io.foxcapades.mc.bukkit.thimble.types.impl.*
+import io.foxcapades.mc.bukkit.thimble.types.jvm.*
 import java.lang.invoke.MethodType
 
 object DefaultTypeHandlerRegistry : TypeHandlerRegistry {
@@ -44,19 +46,26 @@ object DefaultTypeHandlerRegistry : TypeHandlerRegistry {
     registerListTypeHandler(StringListTypeHandler)
 
     registerListTypeHandler(BinaryListTypeHandler)
-    registerListTypeHandler(IntArrayListTypeHandler)
+    registerListTypeHandler(IntegerArrayListTypeHandler)
     registerListTypeHandler(LongArrayListTypeHandler)
 
     registerListTypeHandler(UntypedListTypeHandler)
 
     // BUKKIT TYPES
 
+    registerTypeHandler(AttributeModifierTypeHandler)
+    registerTypeHandler(AttributeModifiersTypeHandler)
     registerTypeHandler(FoodComponentTypeHandler)
     registerTypeHandler(FoodEffectTypeHandler)
+    registerTypeHandler(ItemMetaTypeHandler)
     registerTypeHandler(ItemStackTypeHandler)
+    registerTypeHandler(JukeboxPlayableComponentTypeHandler)
     registerTypeHandler(PersistentDataContainerTypeHandler)
     registerTypeHandler(PotionEffectTypeHandler)
+    registerTypeHandler(ToolComponentTypeHandler)
+    registerTypeHandler(ToolRuleTypeHandler)
 
+    registerListTypeHandler(AttributeModifierListTypeHandler)
     registerListTypeHandler(FoodEffectListTypeHandler)
     registerListTypeHandler(PersistentDataContainerListTypeHandler)
 

@@ -6,4 +6,6 @@ build/
 
 *.jar
 
+/vendor/client/*
+/vendor/server/*
 
