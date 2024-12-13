@@ -80,7 +80,7 @@ internal class Interpreter(stream: Reader) {
     return HeaderEvent(
       stream.requireValue(JsonToken.STRING, JsonReader::nextString),
       try {
-        stream.requireValue(JsonToken.NUMBER, JsonReader::nextInt)
+        stream.requireValue(JsonToken.NUMBER, JsonReader::nextInt).toByte()
       } catch (e: NumberFormatException) {
         throw InvalidThimbleValueException("invalid type version number: was not an int")
       }

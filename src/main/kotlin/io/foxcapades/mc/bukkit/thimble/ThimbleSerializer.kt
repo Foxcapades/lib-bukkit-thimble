@@ -9,7 +9,7 @@ import io.foxcapades.mc.bukkit.thimble.util.takeAs
 import io.foxcapades.mc.bukkit.thimble.write.*
 import java.io.StringWriter
 
-class ThimbleSerializer @JvmOverloads constructor(private val registry: TypeHandlerRegistry = DefaultTypeHandlerRegistry) {
+class ThimbleSerializer @JvmOverloads constructor(private val registry: TypeDefinitionRegistry = DefaultTypeDefinitionRegistry) {
   // region Serialization
 
   fun serialize(value: Any): String {
@@ -19,12 +19,12 @@ class ThimbleSerializer @JvmOverloads constructor(private val registry: TypeHand
 
     if (value is List<*>) {
       @Suppress("UNCHECKED_CAST")
-      json.listValue(value as List<Any>, writer, registry.requireListTypeHandlerFor(value.findListType()) as ListTypeHandler<Any>)
+      json.listValue(value as List<Any>, writer, registry.requireListTypeHandlerFor(value.findListType()) as ListTypeDefinition<Any>)
     } else {
       @Suppress("UNCHECKED_CAST")
-      when (val handler = registry.requireTypeHandlerFor(value::class.java)) {
-        is SimpleTypeHandler<*, *> -> json.serializeSimple(value, handler as SimpleTypeHandler<*, Any>)
-        is ComplexTypeHandler<*>   -> json.complexValue(value, writer, handler as ComplexTypeHandler<Any>)
+      when (val handler = registry.requireTypeDefinitionFor(value::class.java)) {
+        is SimpleTypeDefinition<*, *> -> json.serializeSimple(value, handler as SimpleTypeDefinition<*, Any>)
+        is ComplexTypeDefinition<*>   -> json.complexValue(value, writer, handler as ComplexTypeDefinition<Any>)
         else -> throw IllegalStateException()
       }
     }
@@ -36,7 +36,7 @@ class ThimbleSerializer @JvmOverloads constructor(private val registry: TypeHand
     StringWriter(size).let { it to JsonWriter(it) }
 
   fun <T> serialize(value: T?, asType: Class<in T>): String {
-    val handler = registry.requireTypeHandlerFor(asType)
+    val handler = registry.requireTypeDefinitionFor(asType)
 
     if (List::class.java.isAssignableFrom(asType)) {
       if (value == null) {
@@ -46,7 +46,7 @@ class ThimbleSerializer @JvmOverloads constructor(private val registry: TypeHand
       } else {
         val (out, json) = prepSerializers(4096)
         @Suppress("UNCHECKED_CAST")
-        json.listValue(value as List<Any>, ValueWriterImpl(registry, json), registry.requireListTypeHandlerFor(value.findListType()) as ListTypeHandler<Any>)
+        json.listValue(value as List<Any>, ValueWriterImpl(registry, json), registry.requireListTypeHandlerFor(value.findListType()) as ListTypeDefinition<Any>)
         return out.toString()
       }
     }
@@ -58,13 +58,13 @@ class ThimbleSerializer @JvmOverloads constructor(private val registry: TypeHand
         val json = JsonWriter(out)
 
         when (handler) {
-          is SimpleTypeHandler<*, *> ->
-            json.serializeSimpleNull(handler as SimpleTypeHandler<*, Any>)
+          is SimpleTypeDefinition<*, *> ->
+            json.serializeSimpleNull(handler as SimpleTypeDefinition<*, Any>)
 
-          is ComplexTypeHandler<*> ->
-            json.serializeComplexNull(handler as ComplexTypeHandler<Any>, ValueWriterImpl(registry, json))
+          is ComplexTypeDefinition<*> ->
+            json.serializeComplexNull(handler as ComplexTypeDefinition<Any>, ValueWriterImpl(registry, json))
 
-          is ListTypeHandler<*> -> throw IllegalStateException()
+          is ListTypeDefinition<*> -> throw IllegalStateException()
         }
 
         out
@@ -75,13 +75,13 @@ class ThimbleSerializer @JvmOverloads constructor(private val registry: TypeHand
         val json = JsonWriter(out)
 
         when (handler) {
-          is SimpleTypeHandler<*, *>
-            -> json.serializeSimple(value, handler as SimpleTypeHandler<*, Any>)
+          is SimpleTypeDefinition<*, *>
+            -> json.serializeSimple(value, handler as SimpleTypeDefinition<*, Any>)
 
-          is ComplexTypeHandler<*>
-            -> json.complexValue(value, ValueWriterImpl(registry, json), handler as ComplexTypeHandler<Any>)
+          is ComplexTypeDefinition<*>
+            -> json.complexValue(value, ValueWriterImpl(registry, json), handler as ComplexTypeDefinition<Any>)
 
-          is ListTypeHandler<*> -> throw IllegalStateException()
+          is ListTypeDefinition<*> -> throw IllegalStateException()
         }
 
         out
@@ -89,7 +89,7 @@ class ThimbleSerializer @JvmOverloads constructor(private val registry: TypeHand
     }.toString()
   }
 
-  private fun JsonWriter.serializeSimple(value: Any, handler: SimpleTypeHandler<*, Any>) {
+  private fun JsonWriter.serializeSimple(value: Any, handler: SimpleTypeDefinition<*, Any>) {
     withType(handler) {
       if (it is RawTypeSerializer<*>) {
         @Suppress("UNCHECKED_CAST")
@@ -104,11 +104,11 @@ class ThimbleSerializer @JvmOverloads constructor(private val registry: TypeHand
     }
   }
 
-  private fun JsonWriter.serializeComplexNull(handler: ComplexTypeHandler<Any>, writer: ValueWriter) {
+  private fun JsonWriter.serializeComplexNull(handler: ComplexTypeDefinition<Any>, writer: ValueWriter) {
     withType(handler) { it.serializeNull(writer) }
   }
 
-  private fun JsonWriter.serializeSimpleNull(handler: SimpleTypeHandler<*, Any>) {
+  private fun JsonWriter.serializeSimpleNull(handler: SimpleTypeDefinition<*, Any>) {
     withType(handler) {
       when (val rendered = it.serializeNull()) {
         null -> nullValue()
@@ -134,7 +134,7 @@ class ThimbleSerializer @JvmOverloads constructor(private val registry: TypeHand
 
   private fun Interpreter.deserializeComplex(): Any {
     val header = next().takeAs<HeaderEvent>() ?: throw IllegalStateException()
-    val handler = registry.requireTypeHandlerFor(header.typeIndicator)
+    val handler = registry.requireTypeDefinitionFor(header.typeIndicator)
 
     val deserializer = handler.deserializerFor(header.version)
       as ComplexDeserializer?

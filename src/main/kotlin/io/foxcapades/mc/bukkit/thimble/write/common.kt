@@ -2,17 +2,17 @@ package io.foxcapades.mc.bukkit.thimble.write
 
 import com.google.gson.stream.JsonWriter
 import io.foxcapades.mc.bukkit.thimble.ThimbleSerializationException
-import io.foxcapades.mc.bukkit.thimble.types.ComplexTypeHandler
-import io.foxcapades.mc.bukkit.thimble.types.ListTypeHandler
-import io.foxcapades.mc.bukkit.thimble.types.TypeHandler
+import io.foxcapades.mc.bukkit.thimble.types.ComplexTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.ListTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.ThimbleTypeDefinition
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
 
 
-internal inline fun <T : TypeHandler<D>, D : Any> JsonWriter.withType(handler: T, fn: JsonWriter.(handler: T) -> Unit) {
+internal inline fun <T : ThimbleTypeDefinition<D>, D : Any> JsonWriter.withType(handler: T, fn: JsonWriter.(handler: T) -> Unit) {
   beginArray()
-    .value(handler.typeIndicator)
+    .value(handler.typeIdentifier)
     .value(handler.currentVersion)
 
   fn(handler)
@@ -20,11 +20,11 @@ internal inline fun <T : TypeHandler<D>, D : Any> JsonWriter.withType(handler: T
   endArray()
 }
 
-internal fun <T : Any> JsonWriter.complexValue(value: T, writer: ValueWriter, handler: ComplexTypeHandler<T>) {
+internal fun <T : Any> JsonWriter.complexValue(value: T, writer: ValueWriter, handler: ComplexTypeDefinition<T>) {
   withType(handler) { it.serialize(value, writer) }
 }
 
-internal fun <T : Any> JsonWriter.listValue(value: List<T>, writer: ValueWriter, handler: ListTypeHandler<T>) {
+internal fun <T : Any> JsonWriter.listValue(value: List<T>, writer: ValueWriter, handler: ListTypeDefinition<T>) {
   withType(handler) { it.serialize(value, writer) }
 }
 

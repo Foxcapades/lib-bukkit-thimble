@@ -4,6 +4,7 @@ import io.foxcapades.mc.bukkit.thimble.parse.ComplexDeserializer
 import io.foxcapades.mc.bukkit.thimble.parse.ThimbleDeserializationException
 import io.foxcapades.mc.bukkit.thimble.read.ValueAccessor
 import io.foxcapades.mc.bukkit.thimble.read.asType
+import io.foxcapades.mc.bukkit.thimble.McVersion
 
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
@@ -20,8 +21,28 @@ import org.bukkit.inventory.meta.components.FoodComponent
 import org.bukkit.inventory.meta.components.JukeboxPlayableComponent
 import org.bukkit.inventory.meta.components.ToolComponent
 
+/**
+ * Base [ComplexDeserializer] for [ItemMeta] instances serialized by
+ * implementers of the [ItemMetaTypeDefinitionBase] abstract type.
+ *
+ * This type may be extended by `ItemMeta` subtype deserializers.
+ *
+ * @constructor Creates a new `ItemMeta` deserializer instance.
+ *
+ * @param indexOffset The offset at which base [ItemMeta] property values start
+ * in the incoming [ValueAccessor].
+ *
+ * If subtypes place their own property values _before_ base `ItemMeta`
+ * properties, then this will be the number of properties specific to the
+ * subtype.
+ *
+ * If subtypes place their own property values _after_ base `ItemMeta`
+ * properties, then this will be `0`.
+ */
 @Suppress("UnstableApiUsage")
-open class ItemMetaDeserializerBaseV1 @JvmOverloads constructor(private val indexOffset: Int = 0)
+open class ItemMetaDeserializerBaseV1
+@JvmOverloads
+constructor(private val indexOffset: Int = 0)
   : ComplexDeserializer<ItemMeta>
 {
   private val deserializers = arrayOf<(ValueAccessor) -> Unit>(
@@ -110,7 +131,7 @@ open class ItemMetaDeserializerBaseV1 @JvmOverloads constructor(private val inde
    *
    * To decode, shift off the first `3` bits until value is `0`.
    */
-  var itemFlags: Set<ItemFlag>? = null
+  var itemFlags: Array<ItemFlag>? = null
 
   /**
    * Index `6`: Hide Tooltip Flag
@@ -205,8 +226,45 @@ open class ItemMetaDeserializerBaseV1 @JvmOverloads constructor(private val inde
     deserializers[idx](value)
   }
 
-  override fun build(): ItemMeta {
-    TODO("Not yet implemented")
+  final override fun build(): ItemMeta = newItemMetaInstance().also(::populateItemMeta)
+
+  /**
+   * Extension point for extenders to override and return their own `ItemMeta`
+   * subtype.
+   *
+   * @return A new `ItemMeta` instance to be populated by [populateItemMeta].
+   */
+  protected fun newItemMetaInstance(): ItemMeta {
+    // HOLY HELL THIS IS AWFUL
+    return Class.forName("org.bukkit.craftbukkit.${McVersion}.inventory.CraftMetaItem")
+      .let { it.getConstructor(it) }
+      .apply { isAccessible = true }
+      .newInstance(null) as ItemMeta
+  }
+
+  /**
+   * Extension point for extenders to apply their own properties to the new
+   * `ItemMeta` instance created by [newItemMetaInstance].
+   *
+   * @param itemMeta `ItemMeta` instance to populate.
+   */
+  protected fun populateItemMeta(itemMeta: ItemMeta) {
+    itemMeta.setDisplayName(displayName)
+    itemMeta.setItemName(itemName)
+    itemMeta.lore = lore
+    itemMeta.setCustomModelData(customModelData)
+    enchants?.forEach { (e, l) -> itemMeta.addEnchant(e, l, true) }
+    itemFlags?.let(itemMeta::addItemFlags)
+    itemMeta.isHideTooltip = hideTooltip
+    itemMeta.isUnbreakable = unbreakable
+    itemMeta.setEnchantmentGlintOverride(enchantmentGlintOverride)
+    itemMeta.isFireResistant = fireResistant
+    itemMeta.setMaxStackSize(maxStackSize)
+    itemMeta.setRarity(rarity)
+    itemMeta.setFood(food)
+    itemMeta.setTool(tool)
+    itemMeta.jukeboxPlayable = jukeboxPlayable
+    itemMeta.attributeModifiers = attributeModifiers
   }
 
   protected fun parseDisplayName(value: ValueAccessor) {
@@ -251,11 +309,13 @@ open class ItemMetaDeserializerBaseV1 @JvmOverloads constructor(private val inde
         oct = oct ushr 3
       }
 
-      itemFlags = HashSet(pos)
+      val flags = HashSet<ItemFlag>(pos)
 
       for (i in 0 ..< pos) {
-        (itemFlags as MutableSet).add(ItemFlag.entries[tmp[i]])
+        flags.add(ItemFlag.entries[tmp[i]])
       }
+
+      itemFlags = flags.toTypedArray()
     }
   }
 

@@ -1,7 +1,7 @@
 package io.foxcapades.mc.bukkit.thimble.write
 
 import com.google.gson.stream.JsonWriter
-import io.foxcapades.mc.bukkit.thimble.types.DefaultTypeHandlerRegistry
+import io.foxcapades.mc.bukkit.thimble.types.DefaultTypeDefinitionRegistry
 import org.bukkit.NamespacedKey
 import org.bukkit.craftbukkit.v1_21_R1.persistence.CraftPersistentDataContainer
 import org.bukkit.craftbukkit.v1_21_R1.persistence.CraftPersistentDataTypeRegistry
@@ -22,7 +22,7 @@ class ValueWriterImplTest {
   @BeforeEach
   fun setup() {
     buffer = StringWriter(4096)
-    writer = ValueWriterImpl(DefaultTypeHandlerRegistry, JsonWriter(buffer))
+    writer = ValueWriterImpl(DefaultTypeDefinitionRegistry, JsonWriter(buffer))
   }
 
   // region Binary

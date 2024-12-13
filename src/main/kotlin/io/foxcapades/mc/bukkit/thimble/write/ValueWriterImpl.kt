@@ -2,11 +2,12 @@ package io.foxcapades.mc.bukkit.thimble.write
 
 import com.google.gson.stream.JsonWriter
 import io.foxcapades.mc.bukkit.thimble.types.*
+import org.bukkit.NamespacedKey
 import java.math.BigDecimal
 import java.math.BigInteger
 
 internal class ValueWriterImpl(
-  private val registry: TypeHandlerRegistry,
+  private val registry: TypeDefinitionRegistry,
   private val writer: JsonWriter
 ) : ValueWriter {
   override fun writeBinary(value: ByteArray) = write(value)
@@ -80,6 +81,9 @@ internal class ValueWriterImpl(
 
   override fun writeNull() { writer.nullValue() }
 
+  override fun writeKey(value: NamespacedKey) = write(value.toString())
+  override fun writeKeyOrNull(value: NamespacedKey?) = writeNullable(value?.toString())
+
   override fun writeRaw(value: String) { writer.jsonValue(value) }
 
   override fun writeRawOrNull(value: String?)  { writer.jsonValue(value) }
@@ -89,17 +93,17 @@ internal class ValueWriterImpl(
       return handleUnknownList(value)
 
     @Suppress("UNCHECKED_CAST")
-    when (val handler = registry.requireTypeHandlerFor(value::class.java)) {
-      is SimpleTypeHandler<*, *> ->
-        writer.withType(handler as SimpleTypeHandler<*, Any>) {
+    when (val handler = registry.requireTypeDefinitionFor(value::class.java)) {
+      is SimpleTypeDefinition<*, *> ->
+        writer.withType(handler as SimpleTypeDefinition<*, Any>) {
           if (it is RawTypeSerializer<*>)
             jsonValue((handler as RawTypeSerializer<Any>).serializeToRaw(value))
           else
             simpleValue(it.serialize(value), value::class.java)
         }
 
-      is ComplexTypeHandler<*> ->
-        writer.complexValue(value, this@ValueWriterImpl, (handler as ComplexTypeHandler<Any>))
+      is ComplexTypeDefinition<*> ->
+        writer.complexValue(value, this@ValueWriterImpl, (handler as ComplexTypeDefinition<Any>))
 
       else -> throw IllegalStateException()
     }
@@ -118,14 +122,14 @@ internal class ValueWriterImpl(
 
     @Suppress("UNCHECKED_CAST")
     when (value) {
-      null -> when (val handler = registry.requireTypeHandlerFor(asType)) {
-        is SimpleTypeHandler<*, *> ->
-          writer.withType(handler as SimpleTypeHandler<*, Any>) { simpleValue(it.serializeNull(), asType) }
+      null -> when (val handler = registry.requireTypeDefinitionFor(asType)) {
+        is SimpleTypeDefinition<*, *> ->
+          writer.withType(handler as SimpleTypeDefinition<*, Any>) { simpleValue(it.serializeNull(), asType) }
 
-        is ComplexTypeHandler<*> ->
+        is ComplexTypeDefinition<*> ->
           handler.serializeNull(this)
 
-        is ListTypeHandler<*> -> throw IllegalStateException()
+        is ListTypeDefinition<*> -> throw IllegalStateException()
       }
 
       else -> write(value)
@@ -137,17 +141,17 @@ internal class ValueWriterImpl(
     val handler = if (value.isEmpty())
       registry.requireListTypeHandlerFor(Any::class.java)
     else
-      registry.requireListTypeHandlerFor(value.findListType()) as ListTypeHandler<Any>
+      registry.requireListTypeHandlerFor(value.findListType()) as ListTypeDefinition<Any>
 
     handler.serialize(value as List<Any>, this)
   }
 
   private inline fun <reified T : Any> writeNullable(value: T?) {
     when (value) {
-      null -> when (val handler = registry.requireTypeHandlerFor(T::class.java)) {
-        is SimpleTypeHandler<*, T> -> writer.simpleValue(handler.serializeNull(), T::class.java)
-        is ComplexTypeHandler<T>   -> handler.serializeNull(this)
-        is ListTypeHandler<*>      -> handler.serializeNull(this)
+      null -> when (val handler = registry.requireTypeDefinitionFor(T::class.java)) {
+        is SimpleTypeDefinition<*, in T> -> writer.simpleValue(handler.serializeNull(), T::class.java)
+        is ComplexTypeDefinition<in T>   -> handler.serializeNull(this)
+        is ListTypeDefinition<*>      -> handler.serializeNull(this)
       }
 
       else -> write(value)
@@ -167,10 +171,10 @@ internal class ValueWriterImpl(
 
   private inline fun <reified T : Any> write(value: T) {
     @Suppress("UNCHECKED_CAST")
-    when (val handler = registry.requireTypeHandlerFor(T::class.java)) {
+    when (val handler = registry.requireTypeDefinitionFor(T::class.java)) {
       is RawTypeSerializer<*>   -> writer.jsonValue((handler as RawTypeSerializer<Any>).serializeToRaw(value))
-      is SimpleTypeHandler<*, T> -> writer.simpleValue(handler.serialize(value), T::class.java)
-      is ComplexTypeHandler<T>   -> writer.complexValue(value, this@ValueWriterImpl, handler)
+      is SimpleTypeDefinition<*, *> -> writer.simpleValue((handler as SimpleTypeDefinition<*, Any>).serialize(value), T::class.java)
+      is ComplexTypeDefinition<*>   -> writer.complexValue(value, this@ValueWriterImpl, (handler as ComplexTypeDefinition<Any>))
       else -> throw IllegalStateException()
     }
   }
