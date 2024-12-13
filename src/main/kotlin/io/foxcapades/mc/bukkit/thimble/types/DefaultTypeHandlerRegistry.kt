@@ -34,8 +34,6 @@ object DefaultTypeHandlerRegistry : TypeHandlerRegistry {
     registerTypeHandler(ShortArrayTypeHandler)
     registerTypeHandler(StringArrayTypeHandler)
 
-    registerTypeHandler(PersistentDataContainerTypeHandler)
-
     registerListTypeHandler(ByteListTypeHandler)
     registerListTypeHandler(ShortListTypeHandler)
     registerListTypeHandler(IntegerListTypeHandler)
@@ -49,9 +47,19 @@ object DefaultTypeHandlerRegistry : TypeHandlerRegistry {
     registerListTypeHandler(IntArrayListTypeHandler)
     registerListTypeHandler(LongArrayListTypeHandler)
 
+    registerListTypeHandler(UntypedListTypeHandler)
+
+    // BUKKIT TYPES
+
+    registerTypeHandler(FoodComponentTypeHandler)
+    registerTypeHandler(FoodEffectTypeHandler)
+    registerTypeHandler(ItemStackTypeHandler)
+    registerTypeHandler(PersistentDataContainerTypeHandler)
+    registerTypeHandler(PotionEffectTypeHandler)
+
+    registerListTypeHandler(FoodEffectListTypeHandler)
     registerListTypeHandler(PersistentDataContainerListTypeHandler)
 
-    registerListTypeHandler(UntypedListTypeHandler)
   }
 
   @Throws(ThimbleException::class)
