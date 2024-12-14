@@ -212,10 +212,10 @@ abstract class ItemMetaDeserializerBaseV1<T : ItemMeta> : ComplexDeserializer<T>
    */
   protected var attributeModifiers: Multimap<Attribute, AttributeModifier> = ImmutableListMultimap.of()
 
-  override fun append(index: Int, value: ValueAccessor) {
-    if (index >= deserializers.size)
-      throw ThimbleDeserializationException("invalid value index: $index")
+  override val fieldCount: Int
+    get() = deserializers.size
 
+  override fun append(index: Int, value: ValueAccessor) {
     deserializers[index](value)
   }
 

@@ -6,6 +6,8 @@ import io.foxcapades.mc.bukkit.thimble.types.bukkit.*
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.attribute.AttributeModifierListTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.attribute.AttributeModifierTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.attribute.AttributeModifiersTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.block.banner.PatternListTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.block.banner.PatternTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.entity.EntitySnapshotTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.ItemStackTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta.*
@@ -41,6 +43,10 @@ class DefaultTypeDefinitionRegistry : TypeDefinitionRegistry {
     registerType(AttributeModifiersTypeDefinition())
     registerListType(AttributeModifierListTypeDefinition())
 
+    // Block Banner
+    registerType(PatternTypeDefinition())
+    registerListType(PatternListTypeDefinition())
+
     // Entity
     registerType(EntitySnapshotTypeDefinition())
 
@@ -48,7 +54,9 @@ class DefaultTypeDefinitionRegistry : TypeDefinitionRegistry {
     registerType(ItemStackTypeDefinition())
 
     // Inventory Meta
+    registerType(BannerMetaTypeDefinition())
     registerType(ItemMetaTypeDefinition())
+    registerType(ShieldMetaTypeDefinition())
     registerType(SkullMetaTypeDefinition())
     registerType(SpawnEggMetaTypeDefinition())
     registerType(SuspiciousStewMetaTypeDefinition())

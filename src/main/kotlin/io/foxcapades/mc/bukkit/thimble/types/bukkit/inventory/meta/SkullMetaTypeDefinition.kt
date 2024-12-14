@@ -13,7 +13,7 @@ import org.bukkit.profile.PlayerProfile
 
 open class SkullMetaTypeDefinition : ItemMetaTypeDefinitionBase<SkullMeta>() {
   override val actualType     get() = SkullMeta::class.java
-  override val typeIdentifier get() = "b:m:SM"
+  override val typeIdentifier get() = "b:m:SM2"
 
   override fun serialize(value: SkullMeta, writer: ValueWriter) {
     writer.writeComplexOrNull(value.ownerProfile, PlayerProfile::class.java)
