@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 package io.foxcapades.mc.bukkit.thimble.types.bukkit
 
+import io.foxcapades.mc.bukkit.thimble.hax.meta.JukeboxPlayableComponent
 import io.foxcapades.mc.bukkit.thimble.parse.ComplexDeserializer
 import io.foxcapades.mc.bukkit.thimble.parse.ThimbleDeserializationException
 import io.foxcapades.mc.bukkit.thimble.read.ValueAccessor
@@ -9,14 +10,6 @@ import io.foxcapades.mc.bukkit.thimble.util.B1
 import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
 
 import org.bukkit.inventory.meta.components.JukeboxPlayableComponent
-
-// UNSAFE!!
-import net.minecraft.core.registries.Registries
-import net.minecraft.resources.MinecraftKey
-import net.minecraft.resources.ResourceKey
-import net.minecraft.world.item.EitherHolder
-import net.minecraft.world.item.JukeboxPlayable
-import org.bukkit.craftbukkit.v1_21_R1.inventory.components.CraftJukeboxComponent
 
 
 data object JukeboxPlayableComponentTypeDefinition : ComplexTypeDefinition<JukeboxPlayableComponent> {
@@ -59,9 +52,5 @@ private class JukeboxPlayableComponentDeserializerV1 : ComplexDeserializer<Jukeb
     }
   }
 
-  override fun build(): JukeboxPlayableComponent =
-    CraftJukeboxComponent(JukeboxPlayable(
-      EitherHolder(ResourceKey.a(Registries.L, MinecraftKey.a(songKey))),
-      showInTooltip,
-    ))
+  override fun build(): JukeboxPlayableComponent = JukeboxPlayableComponent(songKey, showInTooltip)
 }

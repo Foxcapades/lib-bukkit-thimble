@@ -1,5 +1,6 @@
 package io.foxcapades.mc.bukkit.thimble.types.bukkit
 
+import io.foxcapades.mc.bukkit.thimble.hax.meta.FoodEffect
 import io.foxcapades.mc.bukkit.thimble.parse.ComplexDeserializer
 import io.foxcapades.mc.bukkit.thimble.parse.ThimbleDeserializationException
 import io.foxcapades.mc.bukkit.thimble.read.ValueAccessor
@@ -9,11 +10,6 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
 
 import org.bukkit.inventory.meta.components.FoodComponent.FoodEffect
 import org.bukkit.potion.PotionEffect
-
-// UNSAFE!!
-import net.minecraft.world.food.FoodInfo
-import org.bukkit.craftbukkit.v1_21_R1.inventory.components.CraftFoodComponent.CraftFoodEffect
-import org.bukkit.craftbukkit.v1_21_R1.potion.CraftPotionUtil
 
 
 @Suppress("UnstableApiUsage")
@@ -45,7 +41,6 @@ data object FoodEffectTypeDefinition : ComplexTypeDefinition<FoodEffect> {
         }
       }
 
-      override fun build(): FoodEffect =
-        CraftFoodEffect(FoodInfo.b(CraftPotionUtil.fromBukkit(effect), probability))
+      override fun build(): FoodEffect = FoodEffect(effect!!, probability)
     }
 }

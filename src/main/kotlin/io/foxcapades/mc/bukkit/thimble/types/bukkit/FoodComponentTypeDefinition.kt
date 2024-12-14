@@ -1,22 +1,16 @@
 package io.foxcapades.mc.bukkit.thimble.types.bukkit
 
+import io.foxcapades.mc.bukkit.thimble.hax.meta.FoodComponent
 import io.foxcapades.mc.bukkit.thimble.parse.ComplexDeserializer
 import io.foxcapades.mc.bukkit.thimble.parse.ThimbleDeserializationException
 import io.foxcapades.mc.bukkit.thimble.read.ValueAccessor
 import io.foxcapades.mc.bukkit.thimble.types.ComplexTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
 
-import java.util.Optional
-
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.components.FoodComponent
 import org.bukkit.inventory.meta.components.FoodComponent.FoodEffect
 
-// UNSAFE!
-import net.minecraft.world.food.FoodInfo
-import org.bukkit.craftbukkit.v1_21_R1.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_21_R1.inventory.components.CraftFoodComponent
-import org.bukkit.craftbukkit.v1_21_R1.inventory.components.CraftFoodComponent.CraftFoodEffect
 
 
 @Suppress("UnstableApiUsage")
@@ -69,16 +63,13 @@ data object FoodComponentTypeDefinition : ComplexTypeDefinition<FoodComponent> {
         }
       }
 
-      override fun build(): FoodComponent {
-        return CraftFoodComponent(FoodInfo(
-          nutrition,
-          saturation,
-          canAlwaysEat,
-          eatSeconds,
-          Optional.ofNullable(convertsTo?.let(CraftItemStack::asNMSCopy)),
-          effects?.map { (it as CraftFoodEffect).handle }
-            ?: emptyList()
-        ))
-      }
+      override fun build(): FoodComponent = FoodComponent(
+        nutrition,
+        saturation,
+        canAlwaysEat,
+        eatSeconds,
+        convertsTo,
+        effects
+      )
     }
 }

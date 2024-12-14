@@ -1,10 +1,10 @@
 package io.foxcapades.mc.bukkit.thimble.types.bukkit
 
+import io.foxcapades.mc.bukkit.thimble.hax.meta.ItemMeta
 import io.foxcapades.mc.bukkit.thimble.parse.ComplexDeserializer
 import io.foxcapades.mc.bukkit.thimble.parse.ThimbleDeserializationException
 import io.foxcapades.mc.bukkit.thimble.read.ValueAccessor
 import io.foxcapades.mc.bukkit.thimble.read.asType
-import io.foxcapades.mc.bukkit.thimble.McVersion
 
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
@@ -40,10 +40,7 @@ import org.bukkit.inventory.meta.components.ToolComponent
  * properties, then this will be `0`.
  */
 @Suppress("UnstableApiUsage")
-open class ItemMetaDeserializerBaseV1
-@JvmOverloads
-constructor(private val indexOffset: Int = 0)
-  : ComplexDeserializer<ItemMeta>
+abstract class ItemMetaDeserializerBaseV1<T : ItemMeta>(private val indexOffset: Int) : ComplexDeserializer<T>
 {
   private val deserializers = arrayOf<(ValueAccessor) -> Unit>(
     ::parseDisplayName,              // 0
@@ -69,28 +66,28 @@ constructor(private val indexOffset: Int = 0)
    *
    * If absent, value is `i32(0)`.
    */
-  var displayName: String? = null
+  protected var displayName: String? = null
 
   /**
    * Index `1`
    *
    * If absent, value is `i32(0)`.
    */
-  var itemName: String? = null
+  protected var itemName: String? = null
 
   /**
    * Index `2`
    *
    * If absent, value is `i32(0)`.
    */
-  var lore: List<String>? = null
+  protected var lore: List<String>? = null
 
   /**
    * Index `3`
    *
    * If present, type is `int`, else value is `null`.
    */
-  var customModelData: Int? = null
+  protected var customModelData: Int? = null
 
   /**
    * Index `4`: Enchantments
@@ -107,7 +104,7 @@ constructor(private val indexOffset: Int = 0)
    * minecraft:protection|1;minecraft:respiration|2
    * ```
    */
-  var enchants: Map<Enchantment, Int>? = null
+  protected var enchants: Map<Enchantment, Int>? = null
 
   /**
    * Index `5`: Item Flags
@@ -131,21 +128,21 @@ constructor(private val indexOffset: Int = 0)
    *
    * To decode, shift off the first `3` bits until value is `0`.
    */
-  var itemFlags: Array<ItemFlag>? = null
+  protected var itemFlags: Array<ItemFlag>? = null
 
   /**
    * Index `6`: Hide Tooltip Flag
    *
    * Represented as either int value `0` or `1`
    */
-  var hideTooltip: Boolean = false
+  protected var hideTooltip: Boolean = false
 
   /**
    * Index `7`: Unbreakable Flag
    *
    * Represented as either int value `0` or `1`
    */
-  var unbreakable: Boolean = false
+  protected var unbreakable: Boolean = false
 
   /**
    * Index `8`: Enchantment Glint Override
@@ -156,21 +153,21 @@ constructor(private val indexOffset: Int = 0)
    * * `1` = `true`
    * * `2` = `null`
    */
-  var enchantmentGlintOverride: Boolean? = null
+  protected var enchantmentGlintOverride: Boolean? = null
 
   /**
    * Index `9`: Fire-Resistant Flag
    *
    * Represented as either int value `0` or `1`
    */
-  var fireResistant: Boolean = false
+  protected var fireResistant: Boolean = false
 
   /**
    * Index `10`: Max Stack Size
    *
    * Value of `0` == `null`.
    */
-  var maxStackSize: Int? = null
+  protected var maxStackSize: Int? = null
 
   /**
    * Index `11`: Item Rarity
@@ -187,35 +184,35 @@ constructor(private val indexOffset: Int = 0)
    * 3 = EPIC
    * ```
    */
-  var rarity: ItemRarity? = null
+  protected var rarity: ItemRarity? = null
 
   /**
    * Index `12`: Food Component
    *
    * If absent, value is `i32(0)`.
    */
-  var food: FoodComponent? = null
+  protected var food: FoodComponent? = null
 
   /**
    * Index `13`: Tool Component
    *
    * If absent, value is `i32(0)`.
    */
-  var tool: ToolComponent? = null
+  protected var tool: ToolComponent? = null
 
   /**
    * Index `14`: Jukebox Component
    *
    * If absent, value is `i32(0)`.
    */
-  var jukeboxPlayable: JukeboxPlayableComponent? = null
+  protected var jukeboxPlayable: JukeboxPlayableComponent? = null
 
   /**
    * Index `15`: Attribute Modifiers
    *
    * If absent, value is `i32(0)`.
    */
-  var attributeModifiers: Multimap<Attribute, AttributeModifier> = ImmutableListMultimap.of()
+  protected var attributeModifiers: Multimap<Attribute, AttributeModifier> = ImmutableListMultimap.of()
 
   override fun append(index: Int, value: ValueAccessor) {
     val idx = index - indexOffset
@@ -226,7 +223,7 @@ constructor(private val indexOffset: Int = 0)
     deserializers[idx](value)
   }
 
-  final override fun build(): ItemMeta = newItemMetaInstance().also(::populateItemMeta)
+  final override fun build(): T = newItemMetaInstance().also(::populateItemMeta)
 
   /**
    * Extension point for extenders to override and return their own `ItemMeta`
@@ -234,13 +231,7 @@ constructor(private val indexOffset: Int = 0)
    *
    * @return A new `ItemMeta` instance to be populated by [populateItemMeta].
    */
-  protected fun newItemMetaInstance(): ItemMeta {
-    // HOLY HELL THIS IS AWFUL
-    return Class.forName("org.bukkit.craftbukkit.${McVersion}.inventory.CraftMetaItem")
-      .let { it.getConstructor(it) }
-      .apply { isAccessible = true }
-      .newInstance(null) as ItemMeta
-  }
+  protected abstract fun newItemMetaInstance(): T
 
   /**
    * Extension point for extenders to apply their own properties to the new
@@ -248,7 +239,7 @@ constructor(private val indexOffset: Int = 0)
    *
    * @param itemMeta `ItemMeta` instance to populate.
    */
-  protected fun populateItemMeta(itemMeta: ItemMeta) {
+  protected open fun populateItemMeta(itemMeta: T) {
     itemMeta.setDisplayName(displayName)
     itemMeta.setItemName(itemName)
     itemMeta.lore = lore

@@ -64,6 +64,7 @@ object DefaultTypeDefinitionRegistry : TypeDefinitionRegistry {
     registerType(PotionEffectTypeDefinition)
     registerType(ToolComponentTypeDefinition)
     registerType(ToolRuleTypeDefinition)
+    registerType(WritableBookMetaTypeDefinition)
 
     registerListTypeHandler(AttributeModifierListTypeDefinition)
     registerListTypeHandler(FoodEffectListTypeDefinition)

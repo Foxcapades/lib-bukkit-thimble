@@ -1,5 +1,6 @@
 package io.foxcapades.mc.bukkit.thimble.types.bukkit
 
+import io.foxcapades.mc.bukkit.thimble.hax.meta.ToolComponent
 import io.foxcapades.mc.bukkit.thimble.parse.ComplexDeserializer
 import io.foxcapades.mc.bukkit.thimble.parse.ThimbleDeserializationException
 import io.foxcapades.mc.bukkit.thimble.read.ValueAccessor
@@ -11,10 +12,6 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
 import org.bukkit.inventory.meta.components.ToolComponent
 import org.bukkit.inventory.meta.components.ToolComponent.ToolRule
 
-// UNSAFE!!
-import net.minecraft.world.item.component.Tool
-import org.bukkit.craftbukkit.v1_21_R1.inventory.components.CraftToolComponent
-import org.bukkit.craftbukkit.v1_21_R1.inventory.components.CraftToolComponent.CraftToolRule
 
 @Suppress("UnstableApiUsage")
 data object ToolComponentTypeDefinition : ComplexTypeDefinition<ToolComponent> {
@@ -67,11 +64,6 @@ private class ToolComponentDeserializerV1 : ComplexDeserializer<ToolComponent> {
     }
   }
 
-  override fun build(): ToolComponent =
-    CraftToolComponent(Tool(
-      rules.map { (it as CraftToolRule).handle },
-      defaultMiningSpeed,
-      damagePerBlock
-    ))
+  override fun build(): ToolComponent = ToolComponent(rules, defaultMiningSpeed, damagePerBlock)
 }
 
