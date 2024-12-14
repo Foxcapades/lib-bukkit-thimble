@@ -2,6 +2,7 @@ package io.foxcapades.mc.bukkit.thimble.types
 
 import io.foxcapades.mc.bukkit.thimble.ThimbleException
 import io.foxcapades.mc.bukkit.thimble.types.impl.*
+import io.foxcapades.mc.bukkit.thimble.types.jvm.*
 
 /**
  * Defines a registry/index of [ThimbleTypeDefinition] instances that may be
@@ -18,6 +19,8 @@ interface TypeDefinitionRegistry {
    */
   var useStrictTypeMatching: Boolean
 
+  // region Registration
+
   /**
    * Registers the given type definition if no conflicting type definition has
    * already been registered.
@@ -31,6 +34,22 @@ interface TypeDefinitionRegistry {
    */
   @Throws(ThimbleException::class)
   fun registerType(definition: ThimbleTypeDefinition<*>)
+
+  /**
+   * Registers the given list type definition if no conflicting type definition
+   * has already been registered.
+   *
+   * @param definition Type definition to register.
+   *
+   * @throws ThimbleException if a conflicting type definition has already been
+   * registered.  Type definitions may conflict on either
+   * [ListTypeDefinition.typeIdentifier] or
+   * [ListTypeDefinition.elementType].
+   */
+  @Throws(ThimbleException::class)
+  fun registerListType(definition: ListTypeDefinition<*>)
+
+  // endregion Registration
 
   /**
    * Returns the registered type definition that would be used to represent the
@@ -127,5 +146,72 @@ interface TypeDefinitionRegistry {
 
   @Throws(ThimbleException::class)
   fun <T : Any> requireListTypeHandlerFor(type: Class<T>): ListTypeDefinition<T>
+
+  companion object {
+    @JvmStatic
+    fun registerJavaScalars(registry: TypeDefinitionRegistry) {
+      registry.apply {
+        registerType(BooleanTypeDefinition())
+
+        registerType(ByteTypeDefinition())
+        registerType(ShortTypeDefinition())
+        registerType(IntegerTypeDefinition())
+        registerType(LongTypeDefinition())
+
+        registerType(CharTypeDefinition())
+
+        registerType(DoubleTypeDefinition())
+        registerType(FloatTypeDefinition())
+
+        registerType(BigDecimalTypeDefinition())
+        registerType(BigIntegerTypeDefinition())
+
+        registerType(StringTypeDefinition())
+      }
+    }
+
+    @JvmStatic
+    fun registerJavaScalarArrays(registry: TypeDefinitionRegistry) {
+      registry.apply {
+        registerType(BooleanArrayTypeDefinition())
+
+        registerType(BinaryTypeDefinition())
+        registerType(ShortArrayTypeDefinition())
+        registerType(IntegerArrayTypeDefinition())
+        registerType(LongArrayTypeDefinition())
+
+        registerType(FloatArrayTypeDefinition())
+        registerType(DoubleArrayTypeDefinition())
+
+        registerType(StringArrayTypeDefinition())
+      }
+    }
+
+    @JvmStatic
+    fun registerJavaScalarLists(registry: TypeDefinitionRegistry) {
+      registry.apply {
+        registerListType(BooleanListTypeDefinition())
+
+        registerListType(ByteListTypeDefinition())
+        registerListType(ShortListTypeDefinition())
+        registerListType(IntegerListTypeDefinition())
+        registerListType(LongListTypeDefinition())
+
+        registerListType(FloatListTypeDefinition())
+        registerListType(DoubleListTypeDefinition())
+
+        registerListType(StringListTypeDefinition())
+      }
+    }
+
+    @JvmStatic
+    fun registerJavaScalarArrayLists(registry: TypeDefinitionRegistry) {
+      registry.apply {
+        registerListType(BinaryListTypeDefinition())
+        registerListType(IntegerArrayListTypeDefinition())
+        registerListType(LongArrayListTypeDefinition())
+      }
+    }
+  }
 }
 

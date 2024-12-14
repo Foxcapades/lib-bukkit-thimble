@@ -8,13 +8,12 @@ import org.bukkit.craftbukkit.v1_21_R1.persistence.CraftPersistentDataContainer
 import org.bukkit.craftbukkit.v1_21_R1.persistence.CraftPersistentDataTypeRegistry
 
 import io.foxcapades.mc.bukkit.thimble.ThimbleException
+import io.foxcapades.mc.bukkit.thimble.hax.mc.toByteArray
 
 import org.bukkit.persistence.PersistentDataContainer
 
 import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
-import java.io.DataOutputStream
 
 fun PersistentDataContainer(nbtData: ByteArray): PersistentDataContainer =
   CraftPersistentDataContainer(CraftPersistentDataTypeRegistry()).apply {
@@ -33,9 +32,3 @@ fun PersistentDataContainer.toNbtData(): ByteArray {
 fun NbtData(): ByteArray =
   NBTTagCompound().toByteArray()
 
-
-private fun NBTTagCompound.toByteArray(): ByteArray {
-  val buffer = ByteArrayOutputStream(f() * 32 + 32)
-  a(DataOutputStream(buffer))
-  return buffer.toByteArray()
-}

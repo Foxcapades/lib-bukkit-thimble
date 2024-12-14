@@ -6,14 +6,15 @@ import io.foxcapades.mc.bukkit.thimble.types.bukkit.*
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.attribute.AttributeModifierListTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.attribute.AttributeModifierTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.attribute.AttributeModifiersTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.entity.EntitySnapshotTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.ItemStackTypeDefinition
-import io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta.ItemMetaTypeDefinition
-import io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta.TropicalFishBucketMetaTypeDefinition
-import io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta.WritableBookMetaTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta.*
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta.components.*
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.persistence.PersistentDataContainerListTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.persistence.PersistentDataContainerTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.potion.PotionEffectListTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.potion.PotionEffectTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.profile.PlayerProfileTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.types.impl.*
 import io.foxcapades.mc.bukkit.thimble.types.jvm.*
 import java.lang.invoke.MethodType
@@ -26,67 +27,58 @@ class DefaultTypeDefinitionRegistry : TypeDefinitionRegistry {
   override var useStrictTypeMatching: Boolean = false
 
   init {
-    registerType(BigDecimalTypeDefinition())
-    registerType(BigIntegerTypeDefinition())
-    registerType(BinaryTypeDefinition())
-    registerType(BooleanTypeDefinition())
-    registerType(ByteTypeDefinition())
-    registerType(CharTypeDefinition())
-    registerType(DoubleTypeDefinition())
-    registerType(FloatTypeDefinition())
-    registerType(IntegerTypeDefinition())
-    registerType(LongTypeDefinition())
-    registerType(ShortTypeDefinition())
-    registerType(StringTypeDefinition())
+    TypeDefinitionRegistry.registerJavaScalars(this)
+    TypeDefinitionRegistry.registerJavaScalarArrays(this)
+    TypeDefinitionRegistry.registerJavaScalarLists(this)
+    TypeDefinitionRegistry.registerJavaScalarArrayLists(this)
 
-    registerType(BooleanArrayTypeDefinition())
-    registerType(DoubleArrayTypeDefinition())
-    registerType(FloatArrayTypeDefinition())
-    registerType(IntegerArrayTypeDefinition())
-    registerType(LongArrayTypeDefinition())
-    registerType(ShortArrayTypeDefinition())
-    registerType(StringArrayTypeDefinition())
-
-    registerListTypeHandler(ByteListTypeDefinition())
-    registerListTypeHandler(ShortListTypeDefinition())
-    registerListTypeHandler(IntegerListTypeDefinition())
-    registerListTypeHandler(LongListTypeDefinition())
-    registerListTypeHandler(FloatListTypeDefinition())
-    registerListTypeHandler(DoubleListTypeDefinition())
-    registerListTypeHandler(BooleanListTypeDefinition())
-    registerListTypeHandler(StringListTypeDefinition())
-
-    registerListTypeHandler(BinaryListTypeDefinition())
-    registerListTypeHandler(IntegerArrayListTypeDefinition())
-    registerListTypeHandler(LongArrayListTypeDefinition())
-
-    registerListTypeHandler(UntypedListTypeDefinition())
+    registerListType(UntypedListTypeDefinition())
 
     // BUKKIT TYPES
 
+    // Attribute
     registerType(AttributeModifierTypeDefinition())
     registerType(AttributeModifiersTypeDefinition())
-    registerType(FoodComponentTypeDefinition())
-    registerType(FoodEffectTypeDefinition())
-    registerType(ItemMetaTypeDefinition())
+    registerListType(AttributeModifierListTypeDefinition())
+
+    // Entity
+    registerType(EntitySnapshotTypeDefinition())
+
+    // Inventory
     registerType(ItemStackTypeDefinition())
-    registerType(JukeboxPlayableComponentTypeDefinition())
-    registerType(PersistentDataContainerTypeDefinition())
-    registerType(PotionEffectTypeDefinition())
-    registerType(ToolComponentTypeDefinition())
-    registerType(ToolRuleTypeDefinition())
+
+    // Inventory Meta
+    registerType(ItemMetaTypeDefinition())
+    registerType(SkullMetaTypeDefinition())
+    registerType(SpawnEggMetaTypeDefinition())
+    registerType(SuspiciousStewMetaTypeDefinition())
     registerType(TropicalFishBucketMetaTypeDefinition())
     registerType(WritableBookMetaTypeDefinition())
 
-    registerListTypeHandler(AttributeModifierListTypeDefinition())
-    registerListTypeHandler(FoodEffectListTypeDefinition())
-    registerListTypeHandler(PersistentDataContainerListTypeDefinition())
+    // Inventory Meta Components
+    registerType(FoodComponentTypeDefinition())
+    registerType(FoodEffectTypeDefinition())
+    registerListType(FoodEffectListTypeDefinition())
+    registerType(JukeboxPlayableComponentTypeDefinition())
+    registerType(ToolComponentTypeDefinition())
+    registerType(ToolRuleTypeDefinition())
+
+    // Persistence
+    registerType(PersistentDataContainerTypeDefinition())
+    registerListType(PersistentDataContainerListTypeDefinition())
+
+    // Potion
+    registerType(PotionEffectTypeDefinition())
+    registerListType(PotionEffectListTypeDefinition())
+
+    // Profile
+    registerType(PlayerProfileTypeDefinition())
   }
 
   @Throws(ThimbleException::class)
   override fun registerType(definition: ThimbleTypeDefinition<*>) {
     if (definition is ListTypeDefinition<*>)
-      return registerListTypeHandler(definition)
+      return registerListType(definition)
 
     tryPutByClass(definition.actualType, definition)
     tryPutByHandle(definition)
@@ -107,39 +99,17 @@ class DefaultTypeDefinitionRegistry : TypeDefinitionRegistry {
   }
 
   @Throws(ThimbleException::class)
-  private fun registerListTypeHandler(handler: ListTypeDefinition<*>) {
-    tryPutByListClass(handler.elementType, handler)
-    tryPutByHandle(handler)
+  override fun registerListType(definition: ListTypeDefinition<*>) {
+    tryPutByListClass(definition.elementType, definition)
+    tryPutByHandle(definition)
 
-    if (handler.elementType.isPrimitive) {
-      tryPutByListClass(MethodType.methodType(handler.elementType).wrap().returnType(), handler)
-    }
-  }
-
-  private fun tryPutByListClass(type: Class<*>, handler: ListTypeDefinition<*>) {
-    if (byListClass[type].takeIf { it !== handler } != null)
-      throw ThimbleException(
-        "attempted to register multiple list serialization handlers for type" +
-          " $type"
-      )
-
-    byListClass[type] = handler
-  }
-
-  private fun tryPutByHandle(handler: ThimbleTypeDefinition<*>) {
-    if (byHandle[handler.typeIdentifier].takeIf { it !== handler } != null)
-      throw ThimbleException(
-        "attempted to register multiple serialization handlers for with the" +
-          " type indicator " +
-          handler.typeIdentifier
-      )
-
-    byHandle[handler.typeIdentifier] = handler
+    if (definition.elementType.isPrimitive)
+      tryPutByListClass(MethodType.methodType(definition.elementType).wrap().returnType(), definition)
   }
 
   override fun containsDefinitionFor(type: Class<*>): Boolean = type in byClass
 
-  override fun containsListHandlerFor(type: Class<*>) = type in byListClass
+  override fun containsListHandlerFor(type: Class<*>): Boolean = type in byListClass
 
   override fun containsDefinitionFor(alias: String): Boolean = alias in byHandle
 
@@ -174,6 +144,27 @@ class DefaultTypeDefinitionRegistry : TypeDefinitionRegistry {
   override fun requireTypeDefinitionFor(identifier: String): ThimbleTypeDefinition<*> =
     typeDefinitionFor(identifier)
       ?: throw ThimbleSerializationException("no type handler for alias $identifier")
+
+  private fun tryPutByListClass(type: Class<*>, handler: ListTypeDefinition<*>) {
+    if (byListClass[type].takeIf { it !== handler } != null)
+      throw ThimbleException(
+        "attempted to register multiple list serialization handlers for type" +
+          " $type"
+      )
+
+    byListClass[type] = handler
+  }
+
+  private fun tryPutByHandle(handler: ThimbleTypeDefinition<*>) {
+    if (byHandle[handler.typeIdentifier].takeIf { it !== handler } != null)
+      throw ThimbleException(
+        "attempted to register multiple serialization handlers for with the" +
+          " type indicator " +
+          handler.typeIdentifier
+      )
+
+    byHandle[handler.typeIdentifier] = handler
+  }
 
   private fun <T : Any> scanAndCache(type: Class<T>): ThimbleTypeDefinition<T>? {
     @Suppress("UNCHECKED_CAST")
