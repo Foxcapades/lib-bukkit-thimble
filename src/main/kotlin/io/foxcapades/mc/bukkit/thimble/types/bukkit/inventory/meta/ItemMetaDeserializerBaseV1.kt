@@ -1,6 +1,5 @@
-package io.foxcapades.mc.bukkit.thimble.types.bukkit
+package io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta
 
-import io.foxcapades.mc.bukkit.thimble.hax.meta.ItemMeta
 import io.foxcapades.mc.bukkit.thimble.parse.ComplexDeserializer
 import io.foxcapades.mc.bukkit.thimble.parse.ThimbleDeserializationException
 import io.foxcapades.mc.bukkit.thimble.read.ValueAccessor
@@ -40,8 +39,7 @@ import org.bukkit.inventory.meta.components.ToolComponent
  * properties, then this will be `0`.
  */
 @Suppress("UnstableApiUsage")
-abstract class ItemMetaDeserializerBaseV1<T : ItemMeta>(private val indexOffset: Int) : ComplexDeserializer<T>
-{
+abstract class ItemMetaDeserializerBaseV1<T : ItemMeta> : ComplexDeserializer<T> {
   private val deserializers = arrayOf<(ValueAccessor) -> Unit>(
     ::parseDisplayName,              // 0
     ::parseItemName,                 // 1
@@ -215,12 +213,10 @@ abstract class ItemMetaDeserializerBaseV1<T : ItemMeta>(private val indexOffset:
   protected var attributeModifiers: Multimap<Attribute, AttributeModifier> = ImmutableListMultimap.of()
 
   override fun append(index: Int, value: ValueAccessor) {
-    val idx = index - indexOffset
-
-    if (idx >= deserializers.size)
+    if (index >= deserializers.size)
       throw ThimbleDeserializationException("invalid value index: $index")
 
-    deserializers[idx](value)
+    deserializers[index](value)
   }
 
   final override fun build(): T = newItemMetaInstance().also(::populateItemMeta)

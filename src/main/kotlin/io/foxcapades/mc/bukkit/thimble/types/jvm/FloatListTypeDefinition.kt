@@ -11,8 +11,8 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object FloatListTypeDefinition : SimpleListTypeDefinition<Float>() {
-  override val elementType   get() = Float::class.java
+open class FloatListTypeDefinition : SimpleListTypeDefinition<Float>() {
+  override val elementType    get() = Float::class.java
   override val typeIdentifier get() = "<f>"
 
   override fun writeValue(value: Float, writer: ValueWriter) =

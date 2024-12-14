@@ -1,4 +1,4 @@
-package io.foxcapades.mc.bukkit.thimble.types.bukkit
+package io.foxcapades.mc.bukkit.thimble.types.bukkit.attribute
 
 import io.foxcapades.mc.bukkit.thimble.read.ValueAccessor
 import io.foxcapades.mc.bukkit.thimble.read.asType
@@ -7,9 +7,9 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
 
 import org.bukkit.attribute.AttributeModifier
 
-data object AttributeModifierListTypeDefinition : SimpleListTypeDefinition<AttributeModifier>() {
+open class AttributeModifierListTypeDefinition : SimpleListTypeDefinition<AttributeModifier>() {
   override val elementType    get() = AttributeModifier::class.java
-  override val typeIdentifier get() = "<${AttributeModifierTypeDefinition.typeIdentifier}>"
+  override val typeIdentifier get() = "<${AttributeModifierKey}>"
 
   override fun writeValue(value: AttributeModifier, writer: ValueWriter) =
     writer.writeComplex(value)

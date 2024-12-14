@@ -1,5 +1,5 @@
 @file:Suppress("UnstableApiUsage")
-package io.foxcapades.mc.bukkit.thimble.types.bukkit
+package io.foxcapades.mc.bukkit.thimble.types.bukkit.attribute
 
 import io.foxcapades.mc.bukkit.thimble.parse.ComplexDeserializer
 import io.foxcapades.mc.bukkit.thimble.parse.ThimbleDeserializationException
@@ -13,10 +13,11 @@ import org.bukkit.attribute.AttributeModifier
 import org.bukkit.attribute.AttributeModifier.Operation
 import org.bukkit.inventory.EquipmentSlotGroup
 
+internal const val AttributeModifierKey = "b:a:AM"
 
-data object AttributeModifierTypeDefinition : ComplexTypeDefinition<AttributeModifier> {
+open class AttributeModifierTypeDefinition : ComplexTypeDefinition<AttributeModifier> {
   override val actualType     get() = AttributeModifier::class.java
-  override val typeIdentifier get() = "b:a:AM"
+  override val typeIdentifier get() = AttributeModifierKey
   override val currentVersion get() = B1
 
   override fun serialize(value: AttributeModifier, writer: ValueWriter) {

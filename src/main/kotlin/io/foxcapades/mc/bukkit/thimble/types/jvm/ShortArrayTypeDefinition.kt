@@ -13,7 +13,7 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object ShortArrayTypeDefinition : ComplexTypeDefinition<ShortArray> {
+open class ShortArrayTypeDefinition : ComplexTypeDefinition<ShortArray> {
   override val actualType     get() = ShortArray::class.java
   override val currentVersion get() = B1
   override val typeIdentifier  get() = "[s]"

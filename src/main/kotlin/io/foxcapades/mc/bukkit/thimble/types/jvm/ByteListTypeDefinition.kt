@@ -10,8 +10,8 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object ByteListTypeDefinition : SimpleListTypeDefinition<Byte>() {
-  override val elementType   get() = Byte::class.java
+open class ByteListTypeDefinition : SimpleListTypeDefinition<Byte>() {
+  override val elementType    get() = Byte::class.java
   override val typeIdentifier get() = "<b>"
 
   override fun writeValue(value: Byte, writer: ValueWriter) =

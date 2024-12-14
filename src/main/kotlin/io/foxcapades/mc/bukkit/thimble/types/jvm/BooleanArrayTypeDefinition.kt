@@ -13,9 +13,9 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object BooleanArrayTypeDefinition : ComplexTypeDefinition<BooleanArray> {
+open class BooleanArrayTypeDefinition : ComplexTypeDefinition<BooleanArray> {
   override val actualType     get() = BooleanArray::class.java
-  override val typeIdentifier  get() = "[B]"
+  override val typeIdentifier get() = "[B]"
   override val currentVersion get() = B1
 
   override fun serialize(value: BooleanArray, writer: ValueWriter) {

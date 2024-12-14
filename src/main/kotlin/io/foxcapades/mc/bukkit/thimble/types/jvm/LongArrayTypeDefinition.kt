@@ -13,9 +13,9 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object LongArrayTypeDefinition : ComplexTypeDefinition<LongArray> {
+open class LongArrayTypeDefinition : ComplexTypeDefinition<LongArray> {
   override val actualType     get() = LongArray::class.java
-  override val typeIdentifier  get() = "[l]"
+  override val typeIdentifier get() = "[l]"
   override val currentVersion get() = B1
 
   override fun deserializerFor(version: Byte): ComplexDeserializer<LongArray>? =

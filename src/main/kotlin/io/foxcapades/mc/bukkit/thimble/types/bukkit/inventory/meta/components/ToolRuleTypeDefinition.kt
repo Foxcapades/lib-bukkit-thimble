@@ -1,4 +1,4 @@
-package io.foxcapades.mc.bukkit.thimble.types.bukkit
+package io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta.components
 
 import io.foxcapades.mc.bukkit.thimble.hax.meta.ToolRule
 import io.foxcapades.mc.bukkit.thimble.parse.ComplexDeserializer
@@ -13,15 +13,10 @@ import org.bukkit.inventory.meta.components.ToolComponent.ToolRule
 
 
 @Suppress("UnstableApiUsage")
-data object ToolRuleTypeDefinition : ComplexTypeDefinition<ToolRule> {
-  override val currentVersion: Byte
-    get() = 1
-
-  override val typeIdentifier: String
-    get() = "b:m:TR"
-
-  override val actualType: Class<ToolRule>
-    get() = ToolRule::class.java
+open class ToolRuleTypeDefinition : ComplexTypeDefinition<ToolRule> {
+  override val actualType     get() = ToolRule::class.java
+  override val typeIdentifier get() = "b:m:TR"
+  override val currentVersion get() = B1
 
   override fun serialize(value: ToolRule, writer: ValueWriter) {
     if (value.blocks.isNotEmpty())

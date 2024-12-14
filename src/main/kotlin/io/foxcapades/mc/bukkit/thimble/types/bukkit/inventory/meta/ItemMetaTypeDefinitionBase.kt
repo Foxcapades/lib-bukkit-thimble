@@ -1,4 +1,4 @@
-package io.foxcapades.mc.bukkit.thimble.types.bukkit
+package io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta
 
 import io.foxcapades.mc.bukkit.thimble.types.ComplexTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.util.B1

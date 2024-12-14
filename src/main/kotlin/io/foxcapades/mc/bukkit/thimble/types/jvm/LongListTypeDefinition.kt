@@ -11,8 +11,8 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object LongListTypeDefinition : SimpleListTypeDefinition<Long>() {
-  override val elementType   get() = Long::class.java
+open class LongListTypeDefinition : SimpleListTypeDefinition<Long>() {
+  override val elementType    get() = Long::class.java
   override val typeIdentifier get() = "<l>"
 
   override fun writeValue(value: Long, writer: ValueWriter) =

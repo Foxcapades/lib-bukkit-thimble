@@ -11,8 +11,8 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object IntegerArrayListTypeDefinition : SimpleListTypeDefinition<IntArray>() {
-  override val elementType   get() = IntArray::class.java
+open class IntegerArrayListTypeDefinition : SimpleListTypeDefinition<IntArray>() {
+  override val elementType    get() = IntArray::class.java
   override val typeIdentifier get() = "<[i]>"
 
   override fun writeValue(value: IntArray, writer: ValueWriter) =

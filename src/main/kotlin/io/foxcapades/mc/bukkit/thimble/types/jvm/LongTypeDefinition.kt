@@ -11,9 +11,9 @@ import io.foxcapades.mc.bukkit.thimble.util.B1
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object LongTypeDefinition : UnaryTypeDefinition<Long> {
+open class LongTypeDefinition : UnaryTypeDefinition<Long> {
   override val actualType     get() = Long::class.java
-  override val typeIdentifier  get() = "l"
+  override val typeIdentifier get() = "l"
   override val currentVersion get() = B1
 
   override fun deserializerFor(version: Byte): SimpleDeserializer<Long>? =

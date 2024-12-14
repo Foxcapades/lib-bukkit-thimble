@@ -11,12 +11,10 @@ import io.foxcapades.mc.bukkit.thimble.util.B1
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object CharTypeDefinition : SimpleTypeDefinition<String, Char> {
-  override val currentVersion get(): Byte = 1
-
+open class CharTypeDefinition : SimpleTypeDefinition<String, Char> {
+  override val actualType     get() = Char::class.java
   override val typeIdentifier get() = "c"
-
-  override val actualType get() = Char::class.java
+  override val currentVersion get() = B1
 
   override fun serialize(value: Char) = value.toString()
 

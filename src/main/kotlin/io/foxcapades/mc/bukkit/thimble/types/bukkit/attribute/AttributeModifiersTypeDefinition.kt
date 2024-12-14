@@ -1,4 +1,4 @@
-package io.foxcapades.mc.bukkit.thimble.types.bukkit
+package io.foxcapades.mc.bukkit.thimble.types.bukkit.attribute
 
 import io.foxcapades.mc.bukkit.thimble.parse.ComplexDeserializer
 import io.foxcapades.mc.bukkit.thimble.read.ValueAccessor
@@ -16,14 +16,11 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 
 
-data object AttributeModifiersTypeDefinition : ComplexTypeDefinition<Multimap<Attribute, AttributeModifier>> {
-  override val typeIdentifier = "b:a:AMM"
-
-  override val currentVersion get(): Byte = 1
-
+open class AttributeModifiersTypeDefinition : ComplexTypeDefinition<Multimap<Attribute, AttributeModifier>> {
   @Suppress("UNCHECKED_CAST")
-  override val actualType: Class<out Multimap<Attribute, AttributeModifier>>
-    get() = Multimap::class.java as Class<out Multimap<Attribute, AttributeModifier>>
+  override val actualType     get() = Multimap::class.java as Class<out Multimap<Attribute, AttributeModifier>>
+  override val typeIdentifier get() = "b:a:AMs"
+  override val currentVersion get() = B1
 
   override fun serialize(value: Multimap<Attribute, AttributeModifier>, writer: ValueWriter) {
     val keys = value.keySet()

@@ -14,8 +14,8 @@ import kotlin.io.encoding.ExperimentalEncodingApi
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object BinaryListTypeDefinition : SimpleListTypeDefinition<ByteArray>() {
-  override val elementType   get() = ByteArray::class.java
+open class BinaryListTypeDefinition : SimpleListTypeDefinition<ByteArray>() {
+  override val elementType    get() = ByteArray::class.java
   override val typeIdentifier get() = "<bin>"
 
   override fun writeValue(value: ByteArray, writer: ValueWriter) =

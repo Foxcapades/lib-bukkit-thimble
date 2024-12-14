@@ -3,7 +3,7 @@ package io.foxcapades.mc.bukkit.thimble.types.impl
 import io.foxcapades.mc.bukkit.thimble.read.ValueAccessor
 import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
 
-data object UntypedListTypeDefinition : SimpleListTypeDefinition<Any>() {
+class UntypedListTypeDefinition : SimpleListTypeDefinition<Any>() {
   override val typeIdentifier: String
     get() = "<*>"
 

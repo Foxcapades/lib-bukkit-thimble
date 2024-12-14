@@ -11,8 +11,8 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object BooleanListTypeDefinition : SimpleListTypeDefinition<Boolean>() {
-  override val elementType   get() = Boolean::class.java
+open class BooleanListTypeDefinition : SimpleListTypeDefinition<Boolean>() {
+  override val elementType    get() = Boolean::class.java
   override val typeIdentifier get() = "<B>"
 
   override fun writeValue(value: Boolean, writer: ValueWriter) =

@@ -1,7 +1,7 @@
 package io.foxcapades.mc.bukkit.thimble.types.impl
 
 import io.foxcapades.mc.bukkit.thimble.read.StringAccessor
-import io.foxcapades.mc.bukkit.thimble.types.bukkit.PersistentDataContainerTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.persistence.PersistentDataContainerTypeDefinition
 import org.bukkit.NamespacedKey
 import org.bukkit.persistence.PersistentDataType
 import org.junit.jupiter.api.Test

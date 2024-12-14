@@ -19,9 +19,9 @@ import kotlin.math.floor
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object FloatTypeDefinition : UnaryTypeDefinition<Float>, RawTypeSerializer<Float> {
+open class FloatTypeDefinition : UnaryTypeDefinition<Float>, RawTypeSerializer<Float> {
   override val actualType     get() = Float::class.java
-  override val typeIdentifier  get() = "f"
+  override val typeIdentifier get() = "f"
   override val currentVersion get() = B1
 
   override fun deserializerFor(version: Byte): SimpleDeserializer<Float>? =

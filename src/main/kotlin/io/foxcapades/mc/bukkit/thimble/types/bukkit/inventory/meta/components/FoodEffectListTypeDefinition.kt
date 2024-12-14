@@ -1,4 +1,4 @@
-package io.foxcapades.mc.bukkit.thimble.types.bukkit
+package io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta.components
 
 import io.foxcapades.mc.bukkit.thimble.read.ValueAccessor
 import io.foxcapades.mc.bukkit.thimble.types.impl.SimpleListTypeDefinition
@@ -6,13 +6,11 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
 
 import org.bukkit.inventory.meta.components.FoodComponent.FoodEffect
 
-@Suppress("UnstableApiUsage")
-data object FoodEffectListTypeDefinition : SimpleListTypeDefinition<FoodEffect>() {
-  override val elementType: Class<FoodEffect>
-    get() = FoodEffect::class.java
 
-  override val typeIdentifier: String
-    get() = "<${FoodEffectTypeDefinition.typeIdentifier}>"
+@Suppress("UnstableApiUsage")
+open class FoodEffectListTypeDefinition : SimpleListTypeDefinition<FoodEffect>() {
+  override val elementType    get() = FoodEffect::class.java
+  override val typeIdentifier get() = "<${FoodEffectKey}>"
 
   override fun writeValue(value: FoodEffect, writer: ValueWriter) {
     writer.writeComplex(value)

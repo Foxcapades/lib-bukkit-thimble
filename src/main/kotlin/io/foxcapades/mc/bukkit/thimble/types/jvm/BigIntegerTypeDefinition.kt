@@ -11,12 +11,10 @@ import java.math.BigInteger
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object BigIntegerTypeDefinition : UnaryTypeDefinition<BigInteger> {
-  override val currentVersion get(): Byte = 1
-
+open class BigIntegerTypeDefinition : UnaryTypeDefinition<BigInteger> {
+  override val actualType     get() = BigInteger::class.java
   override val typeIdentifier get() = "I"
-
-  override val actualType get() = BigInteger::class.java
+  override val currentVersion get() = B1
 
   override fun deserializerFor(version: Byte): SimpleDeserializer<BigInteger>? =
     when (version) {

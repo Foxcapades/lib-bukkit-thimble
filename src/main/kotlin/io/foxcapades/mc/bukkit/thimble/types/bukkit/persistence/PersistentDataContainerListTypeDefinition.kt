@@ -1,4 +1,4 @@
-package io.foxcapades.mc.bukkit.thimble.types.bukkit
+package io.foxcapades.mc.bukkit.thimble.types.bukkit.persistence
 
 import io.foxcapades.mc.bukkit.thimble.read.ValueAccessor
 import io.foxcapades.mc.bukkit.thimble.types.impl.SimpleListTypeDefinition
@@ -7,12 +7,9 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
 import org.bukkit.persistence.PersistentDataContainer
 
 
-data object PersistentDataContainerListTypeDefinition : SimpleListTypeDefinition<PersistentDataContainer>() {
-  override val typeIdentifier: String
-    get() = "<pdc>"
-
-  override val elementType: Class<PersistentDataContainer>
-    get() = PersistentDataContainer::class.java
+open class PersistentDataContainerListTypeDefinition : SimpleListTypeDefinition<PersistentDataContainer>() {
+  override val elementType    get() = PersistentDataContainer::class.java
+  override val typeIdentifier get() = "<pdc>"
 
   override fun writeValue(value: PersistentDataContainer, writer: ValueWriter) =
     writer.writeComplex(value)

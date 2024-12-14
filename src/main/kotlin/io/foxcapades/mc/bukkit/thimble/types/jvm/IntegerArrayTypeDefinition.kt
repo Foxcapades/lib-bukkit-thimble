@@ -6,12 +6,10 @@ import io.foxcapades.mc.bukkit.thimble.types.ComplexTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.util.B1
 import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
 
-data object IntegerArrayTypeDefinition : ComplexTypeDefinition<IntArray> {
-  override val currentVersion get(): Byte = 1
-
+open class IntegerArrayTypeDefinition : ComplexTypeDefinition<IntArray> {
+  override val actualType     get() = IntArray::class.java
   override val typeIdentifier get() = "[i]"
-
-  override val actualType get() = IntArray::class.java
+  override val currentVersion get() = B1
 
   override fun deserializerFor(version: Byte): ComplexDeserializer<IntArray>? =
     when (version) {

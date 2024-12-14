@@ -13,9 +13,9 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object DoubleArrayTypeDefinition : ComplexTypeDefinition<DoubleArray> {
+open class DoubleArrayTypeDefinition : ComplexTypeDefinition<DoubleArray> {
   override val actualType     get() = DoubleArray::class.java
-  override val typeIdentifier  get() = "[d]"
+  override val typeIdentifier get() = "[d]"
   override val currentVersion get() = B1
 
   override fun serialize(value: DoubleArray, writer: ValueWriter) {

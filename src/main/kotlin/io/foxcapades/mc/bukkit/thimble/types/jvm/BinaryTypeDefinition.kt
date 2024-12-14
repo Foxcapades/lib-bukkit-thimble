@@ -14,12 +14,10 @@ import kotlin.io.encoding.ExperimentalEncodingApi
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object BinaryTypeDefinition : SimpleTypeDefinition<String, ByteArray> {
+open class BinaryTypeDefinition : SimpleTypeDefinition<String, ByteArray> {
+  override val actualType     get() = ByteArray::class.java
   override val typeIdentifier get() = "bin"
-
-  override val currentVersion get(): Byte = 1
-
-  override val actualType get() = ByteArray::class.java
+  override val currentVersion get() = B1
 
   @OptIn(ExperimentalEncodingApi::class)
   override fun serialize(value: ByteArray) = Base64.encode(value)

@@ -11,8 +11,8 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object DoubleListTypeDefinition : SimpleListTypeDefinition<Double>() {
-  override val elementType   get() = Double::class.java
+open class DoubleListTypeDefinition : SimpleListTypeDefinition<Double>() {
+  override val elementType    get() = Double::class.java
   override val typeIdentifier get() = "<d>"
 
   override fun writeValue(value: Double, writer: ValueWriter) =

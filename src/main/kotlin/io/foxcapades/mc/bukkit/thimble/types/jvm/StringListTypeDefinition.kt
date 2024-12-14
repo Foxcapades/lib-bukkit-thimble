@@ -11,8 +11,8 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object StringListTypeDefinition : SimpleListTypeDefinition<String>() {
-  override val elementType   get() = String::class.java
+open class StringListTypeDefinition : SimpleListTypeDefinition<String>() {
+  override val elementType    get() = String::class.java
   override val typeIdentifier get() = "<S>"
 
   override fun writeValue(value: String, writer: ValueWriter) =

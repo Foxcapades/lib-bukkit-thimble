@@ -1,4 +1,4 @@
-package io.foxcapades.mc.bukkit.thimble.types.bukkit
+package io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory
 
 import io.foxcapades.mc.bukkit.thimble.parse.ComplexDeserializer
 import io.foxcapades.mc.bukkit.thimble.parse.ThimbleDeserializationException
@@ -12,20 +12,17 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
 
-data object ItemStackTypeDefinition : ComplexTypeDefinition<ItemStack> {
-  override val typeIdentifier: String
-    get() = "b:i:IS"
-
-  override val currentVersion: Byte
-    get() = 1
-
-  override val actualType: Class<ItemStack>
-    get() = ItemStack::class.java
+open class ItemStackTypeDefinition : ComplexTypeDefinition<ItemStack> {
+  override val actualType     get() = ItemStack::class.java
+  override val typeIdentifier get() = "b:i:IS"
+  override val currentVersion get() = B1
 
   override fun serialize(value: ItemStack, writer: ValueWriter) {
     writer.writeString(value.type.key.toString())
     writer.writeInt(value.amount)
+
     // skip material data
+
     if (value.hasItemMeta())
       writer.writeComplex(value.itemMeta!!)
     else

@@ -16,13 +16,15 @@ import java.math.BigInteger
 
 @DisplayName("ValueWriterImpl")
 class ValueWriterImplTest {
+  private val registry = DefaultTypeDefinitionRegistry()
+
   private lateinit var buffer: StringWriter
   private lateinit var writer: ValueWriterImpl
 
   @BeforeEach
   fun setup() {
     buffer = StringWriter(4096)
-    writer = ValueWriterImpl(DefaultTypeDefinitionRegistry, JsonWriter(buffer))
+    writer = ValueWriterImpl(registry, JsonWriter(buffer))
   }
 
   // region Binary

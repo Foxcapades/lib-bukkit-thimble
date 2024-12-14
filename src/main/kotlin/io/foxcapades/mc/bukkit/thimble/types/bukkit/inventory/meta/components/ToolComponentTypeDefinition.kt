@@ -1,4 +1,4 @@
-package io.foxcapades.mc.bukkit.thimble.types.bukkit
+package io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta.components
 
 import io.foxcapades.mc.bukkit.thimble.hax.meta.ToolComponent
 import io.foxcapades.mc.bukkit.thimble.parse.ComplexDeserializer
@@ -14,7 +14,7 @@ import org.bukkit.inventory.meta.components.ToolComponent.ToolRule
 
 
 @Suppress("UnstableApiUsage")
-data object ToolComponentTypeDefinition : ComplexTypeDefinition<ToolComponent> {
+open class ToolComponentTypeDefinition : ComplexTypeDefinition<ToolComponent> {
   override val typeIdentifier: String
     get() = "b:m:TC"
 

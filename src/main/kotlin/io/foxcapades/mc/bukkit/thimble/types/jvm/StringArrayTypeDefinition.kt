@@ -13,9 +13,9 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object StringArrayTypeDefinition : ComplexTypeDefinition<Array<String>> {
+open class StringArrayTypeDefinition : ComplexTypeDefinition<Array<String>> {
   override val actualType     get() = Array<String>::class.java
-  override val typeIdentifier  get() = "[S]"
+  override val typeIdentifier get() = "[S]"
   override val currentVersion get() = B1
 
   override fun deserializerFor(version: Byte): ComplexDeserializer<Array<String>>? =

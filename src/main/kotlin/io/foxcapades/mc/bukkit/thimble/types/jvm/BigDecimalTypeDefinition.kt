@@ -11,9 +11,9 @@ import java.math.BigDecimal
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object BigDecimalTypeDefinition : UnaryTypeDefinition<BigDecimal> {
+open class BigDecimalTypeDefinition : UnaryTypeDefinition<BigDecimal> {
   override val actualType     get() = BigDecimal::class.java
-  override val typeIdentifier  get() = "D"
+  override val typeIdentifier get() = "D"
   override val currentVersion get() = B1
 
   override fun deserializerFor(version: Byte): SimpleDeserializer<BigDecimal>? =

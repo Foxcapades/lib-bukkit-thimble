@@ -11,10 +11,10 @@ import io.foxcapades.mc.bukkit.thimble.util.B1
  * @author Elizabeth Paige Harper - https://github.com/foxcapades
  * @since 1.0.0
  */
-data object StringTypeDefinition : UnaryTypeDefinition<String> {
-  override val currentVersion get(): Byte = 1
+open class StringTypeDefinition : UnaryTypeDefinition<String> {
+  override val actualType     get() = String::class.java
+  override val currentVersion get() = B1
   override val typeIdentifier get() = "S"
-  override val actualType get() = String::class.java
 
   override fun deserializerFor(version: Byte): SimpleDeserializer<String>? =
     when (version) {

@@ -9,7 +9,10 @@ import io.foxcapades.mc.bukkit.thimble.util.takeAs
 import io.foxcapades.mc.bukkit.thimble.write.*
 import java.io.StringWriter
 
-class ThimbleSerializer @JvmOverloads constructor(private val registry: TypeDefinitionRegistry = DefaultTypeDefinitionRegistry) {
+class ThimbleSerializer
+@JvmOverloads
+constructor(private val registry: TypeDefinitionRegistry = DefaultTypeDefinitionRegistry())
+{
   // region Serialization
 
   fun serialize(value: Any): String {

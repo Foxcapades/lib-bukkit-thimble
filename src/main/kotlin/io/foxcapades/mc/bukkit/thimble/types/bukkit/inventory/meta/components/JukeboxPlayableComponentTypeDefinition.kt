@@ -1,5 +1,5 @@
 @file:Suppress("UnstableApiUsage")
-package io.foxcapades.mc.bukkit.thimble.types.bukkit
+package io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta.components
 
 import io.foxcapades.mc.bukkit.thimble.hax.meta.JukeboxPlayableComponent
 import io.foxcapades.mc.bukkit.thimble.parse.ComplexDeserializer
@@ -12,12 +12,10 @@ import io.foxcapades.mc.bukkit.thimble.write.ValueWriter
 import org.bukkit.inventory.meta.components.JukeboxPlayableComponent
 
 
-data object JukeboxPlayableComponentTypeDefinition : ComplexTypeDefinition<JukeboxPlayableComponent> {
+open class JukeboxPlayableComponentTypeDefinition : ComplexTypeDefinition<JukeboxPlayableComponent> {
+  override val actualType     get() = JukeboxPlayableComponent::class.java
   override val typeIdentifier get() = "b:m:JPC"
-
-  override val currentVersion get(): Byte = 1
-
-  override val actualType get() = JukeboxPlayableComponent::class.java
+  override val currentVersion get() = B1
 
   override fun serialize(value: JukeboxPlayableComponent, writer: ValueWriter) {
     writer.writeString(value.songKey.key)

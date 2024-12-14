@@ -3,11 +3,22 @@ package io.foxcapades.mc.bukkit.thimble.types
 import io.foxcapades.mc.bukkit.thimble.ThimbleException
 import io.foxcapades.mc.bukkit.thimble.ThimbleSerializationException
 import io.foxcapades.mc.bukkit.thimble.types.bukkit.*
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.attribute.AttributeModifierListTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.attribute.AttributeModifierTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.attribute.AttributeModifiersTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.ItemStackTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta.ItemMetaTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta.TropicalFishBucketMetaTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta.WritableBookMetaTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.inventory.meta.components.*
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.persistence.PersistentDataContainerListTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.persistence.PersistentDataContainerTypeDefinition
+import io.foxcapades.mc.bukkit.thimble.types.bukkit.potion.PotionEffectTypeDefinition
 import io.foxcapades.mc.bukkit.thimble.types.impl.*
 import io.foxcapades.mc.bukkit.thimble.types.jvm.*
 import java.lang.invoke.MethodType
 
-object DefaultTypeDefinitionRegistry : TypeDefinitionRegistry {
+class DefaultTypeDefinitionRegistry : TypeDefinitionRegistry {
   private val byHandle = HashMap<String, ThimbleTypeDefinition<*>>(32)
   private val byClass = HashMap<Class<*>, ThimbleTypeDefinition<*>>(19)
   private val byListClass = HashMap<Class<*>, ListTypeDefinition<*>>(12)
@@ -15,61 +26,61 @@ object DefaultTypeDefinitionRegistry : TypeDefinitionRegistry {
   override var useStrictTypeMatching: Boolean = false
 
   init {
-    registerType(BigDecimalTypeDefinition)
-    registerType(BigIntegerTypeDefinition)
-    registerType(BinaryTypeDefinition)
-    registerType(BooleanTypeDefinition)
-    registerType(ByteTypeDefinition)
-    registerType(CharTypeDefinition)
-    registerType(DoubleTypeDefinition)
-    registerType(FloatTypeDefinition)
-    registerType(IntegerTypeDefinition)
-    registerType(LongTypeDefinition)
-    registerType(ShortTypeDefinition)
-    registerType(StringTypeDefinition)
+    registerType(BigDecimalTypeDefinition())
+    registerType(BigIntegerTypeDefinition())
+    registerType(BinaryTypeDefinition())
+    registerType(BooleanTypeDefinition())
+    registerType(ByteTypeDefinition())
+    registerType(CharTypeDefinition())
+    registerType(DoubleTypeDefinition())
+    registerType(FloatTypeDefinition())
+    registerType(IntegerTypeDefinition())
+    registerType(LongTypeDefinition())
+    registerType(ShortTypeDefinition())
+    registerType(StringTypeDefinition())
 
-    registerType(BooleanArrayTypeDefinition)
-    registerType(DoubleArrayTypeDefinition)
-    registerType(FloatArrayTypeDefinition)
-    registerType(IntegerArrayTypeDefinition)
-    registerType(LongArrayTypeDefinition)
-    registerType(ShortArrayTypeDefinition)
-    registerType(StringArrayTypeDefinition)
+    registerType(BooleanArrayTypeDefinition())
+    registerType(DoubleArrayTypeDefinition())
+    registerType(FloatArrayTypeDefinition())
+    registerType(IntegerArrayTypeDefinition())
+    registerType(LongArrayTypeDefinition())
+    registerType(ShortArrayTypeDefinition())
+    registerType(StringArrayTypeDefinition())
 
-    registerListTypeHandler(ByteListTypeDefinition)
-    registerListTypeHandler(ShortListTypeDefinition)
-    registerListTypeHandler(IntegerListTypeDefinition)
-    registerListTypeHandler(LongListTypeDefinition)
-    registerListTypeHandler(FloatListTypeDefinition)
-    registerListTypeHandler(DoubleListTypeDefinition)
-    registerListTypeHandler(BooleanListTypeDefinition)
-    registerListTypeHandler(StringListTypeDefinition)
+    registerListTypeHandler(ByteListTypeDefinition())
+    registerListTypeHandler(ShortListTypeDefinition())
+    registerListTypeHandler(IntegerListTypeDefinition())
+    registerListTypeHandler(LongListTypeDefinition())
+    registerListTypeHandler(FloatListTypeDefinition())
+    registerListTypeHandler(DoubleListTypeDefinition())
+    registerListTypeHandler(BooleanListTypeDefinition())
+    registerListTypeHandler(StringListTypeDefinition())
 
-    registerListTypeHandler(BinaryListTypeDefinition)
-    registerListTypeHandler(IntegerArrayListTypeDefinition)
-    registerListTypeHandler(LongArrayListTypeDefinition)
+    registerListTypeHandler(BinaryListTypeDefinition())
+    registerListTypeHandler(IntegerArrayListTypeDefinition())
+    registerListTypeHandler(LongArrayListTypeDefinition())
 
-    registerListTypeHandler(UntypedListTypeDefinition)
+    registerListTypeHandler(UntypedListTypeDefinition())
 
     // BUKKIT TYPES
 
-    registerType(AttributeModifierTypeDefinition)
-    registerType(AttributeModifiersTypeDefinition)
-    registerType(FoodComponentTypeDefinition)
-    registerType(FoodEffectTypeDefinition)
-    registerType(ItemMetaTypeDefinition)
-    registerType(ItemStackTypeDefinition)
-    registerType(JukeboxPlayableComponentTypeDefinition)
-    registerType(PersistentDataContainerTypeDefinition)
-    registerType(PotionEffectTypeDefinition)
-    registerType(ToolComponentTypeDefinition)
-    registerType(ToolRuleTypeDefinition)
-    registerType(WritableBookMetaTypeDefinition)
+    registerType(AttributeModifierTypeDefinition())
+    registerType(AttributeModifiersTypeDefinition())
+    registerType(FoodComponentTypeDefinition())
+    registerType(FoodEffectTypeDefinition())
+    registerType(ItemMetaTypeDefinition())
+    registerType(ItemStackTypeDefinition())
+    registerType(JukeboxPlayableComponentTypeDefinition())
+    registerType(PersistentDataContainerTypeDefinition())
+    registerType(PotionEffectTypeDefinition())
+    registerType(ToolComponentTypeDefinition())
+    registerType(ToolRuleTypeDefinition())
+    registerType(TropicalFishBucketMetaTypeDefinition())
+    registerType(WritableBookMetaTypeDefinition())
 
-    registerListTypeHandler(AttributeModifierListTypeDefinition)
-    registerListTypeHandler(FoodEffectListTypeDefinition)
-    registerListTypeHandler(PersistentDataContainerListTypeDefinition)
-
+    registerListTypeHandler(AttributeModifierListTypeDefinition())
+    registerListTypeHandler(FoodEffectListTypeDefinition())
+    registerListTypeHandler(PersistentDataContainerListTypeDefinition())
   }
 
   @Throws(ThimbleException::class)
