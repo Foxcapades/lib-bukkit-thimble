@@ -1,7 +1,7 @@
 package io.foxcapades.mc.bukkit.thimble.types.impl
 
-import io.foxcapades.mc.bukkit.thimble.read.NumberAccessor
-import io.foxcapades.mc.bukkit.thimble.read.StringAccessor
+import io.foxcapades.mc.bukkit.thimble.old.read.NumberAccessor
+import io.foxcapades.mc.bukkit.thimble.old.read.StringAccessor
 import io.foxcapades.mc.bukkit.thimble.types.jvm.BinaryListTypeDefinition
 import org.junit.jupiter.api.Test
 

@@ -3,41 +3,42 @@ plugins {
   `maven-publish`
 }
 
-val mcVersion = "1.21.1"
+allprojects {
+  apply(plugin="org.jetbrains.kotlin.jvm")
 
-group = "io.foxcapades.mc.bukkit"
-version = "1.0.0-SNAPSHOT"
+  group = "io.foxcapades.mc.bukkit"
+  version = "1.0.0-SNAPSHOT"
 
-repositories {
-  mavenCentral()
-  maven { url = uri("/home/ellie/.cache/maven/repo") }
-  maven { url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") }
-}
+  repositories {
+    mavenCentral()
+    maven { url = uri("/home/ellie/.cache/maven/repo") }
+    maven { url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") }
+  }
 
-dependencies {
-  compileOnly("org.spigotmc:spigot-api:${mcVersion}-R0.1-SNAPSHOT")
-  compileOnly("org.bukkit:craftbukkit:${mcVersion}-R0.1-SNAPSHOT")
+  kotlin {
+    compilerOptions {
+      jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
+  }
 
-  implementation(kotlin("reflect"))
+  java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+  }
 
-  testImplementation("org.spigotmc:spigot-api:${mcVersion}-R0.1-SNAPSHOT")
-  testImplementation("org.bukkit:craftbukkit:${mcVersion}-R0.1-SNAPSHOT")
-  testImplementation("org.junit.jupiter:junit-jupiter:5.11.3")
-}
-
-kotlin {
-  compilerOptions {
-    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+  tasks.test {
+    useJUnitPlatform()
   }
 }
 
-java {
-  sourceCompatibility = JavaVersion.VERSION_17
-  targetCompatibility = JavaVersion.VERSION_17
-}
+dependencies {
+  compileOnly(libs.spigot.api.v1x21x3)
 
-tasks.test {
-  useJUnitPlatform()
+  implementation(project(":jvm-codecs"))
+  implementation(project(":unsafe-1.21.3"))
+
+  testImplementation(libs.spigot.api.v1x21x3)
+  testImplementation("org.junit.jupiter:junit-jupiter:5.11.3")
 }
 
 publishing {

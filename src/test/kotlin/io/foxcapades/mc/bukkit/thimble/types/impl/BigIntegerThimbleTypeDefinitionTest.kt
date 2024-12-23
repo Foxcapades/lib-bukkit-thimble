@@ -1,6 +1,6 @@
 package io.foxcapades.mc.bukkit.thimble.types.impl
 
-import io.foxcapades.mc.bukkit.thimble.read.NumberAccessor
+import io.foxcapades.mc.bukkit.thimble.old.read.NumberAccessor
 import io.foxcapades.mc.bukkit.thimble.types.jvm.BigIntegerTypeDefinition
 import org.junit.jupiter.api.Test
 

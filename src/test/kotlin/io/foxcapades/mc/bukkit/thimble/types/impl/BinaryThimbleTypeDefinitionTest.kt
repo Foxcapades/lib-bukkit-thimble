@@ -1,6 +1,6 @@
 package io.foxcapades.mc.bukkit.thimble.types.impl
 
-import io.foxcapades.mc.bukkit.thimble.read.StringAccessor
+import io.foxcapades.mc.bukkit.thimble.old.read.StringAccessor
 import io.foxcapades.mc.bukkit.thimble.types.jvm.BinaryTypeDefinition
 import org.junit.jupiter.api.Test
 

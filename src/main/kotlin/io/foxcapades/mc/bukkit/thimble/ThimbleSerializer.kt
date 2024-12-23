@@ -1,166 +1,55 @@
 package io.foxcapades.mc.bukkit.thimble
 
-import com.google.gson.stream.JsonWriter
-import io.foxcapades.mc.bukkit.thimble.interpret.*
-import io.foxcapades.mc.bukkit.thimble.parse.ComplexDeserializer
-import io.foxcapades.mc.bukkit.thimble.read.*
-import io.foxcapades.mc.bukkit.thimble.types.*
-import io.foxcapades.mc.bukkit.thimble.util.takeAs
-import io.foxcapades.mc.bukkit.thimble.write.*
-import java.io.StringWriter
+import io.foxcapades.mc.bukkit.thimble.codecs.Codec
+import io.foxcapades.mc.bukkit.thimble.codecs.jvm.*
+import java.io.ByteArrayOutputStream
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
-class ThimbleSerializer
-@JvmOverloads
-constructor(private val registry: TypeDefinitionRegistry = DefaultTypeDefinitionRegistry())
-{
-  // region Serialization
+class ThimbleSerializer {
+  private val instanceCodecs = HashMap<Class<*>, Codec<*>>(32)
 
-  fun serialize(value: Any): String {
-    val out = StringWriter(4096)
-    val json = JsonWriter(out)
-    val writer = ValueWriterImpl(registry, json)
+  @OptIn(ExperimentalEncodingApi::class)
+  fun serializeToString(value: Any): String =
+    Base64.encode(serializeToBytes(value))
 
-    if (value is List<*>) {
-      @Suppress("UNCHECKED_CAST")
-      json.listValue(value as List<Any>, writer, registry.requireListTypeHandlerFor(value.findListType()) as ListTypeDefinition<Any>)
-    } else {
-      @Suppress("UNCHECKED_CAST")
-      when (val handler = registry.requireTypeDefinitionFor(value::class.java)) {
-        is SimpleTypeDefinition<*, *> -> json.serializeSimple(value, handler as SimpleTypeDefinition<*, Any>)
-        is ComplexTypeDefinition<*>   -> json.complexValue(value, writer, handler as ComplexTypeDefinition<Any>)
-        else -> throw IllegalStateException()
-      }
-    }
-
-    return out.toString()
+  fun serializeToBytes(value: Any): ByteArray {
+    return if (value::class.javaPrimitiveType != null)
+      serializePrimitive(value)
+    else
+      serializeInstance(value)
   }
 
-  private fun prepSerializers(size: Int): Pair<StringWriter, JsonWriter> =
-    StringWriter(size).let { it to JsonWriter(it) }
+  @OptIn(ExperimentalEncodingApi::class)
+  fun deserialize(value: String): Any =
+    deserialize(Base64.decode(value))
 
-  fun <T> serialize(value: T?, asType: Class<in T>): String {
-    val handler = registry.requireTypeDefinitionFor(asType)
+  fun deserialize(value: ByteArray): Any {
 
-    if (List::class.java.isAssignableFrom(asType)) {
-      if (value == null) {
-        val (out, json) = prepSerializers(32)
-        registry.requireListTypeHandlerFor(Any::class.java).serializeNull(ValueWriterImpl(registry, json))
-        return out.toString()
-      } else {
-        val (out, json) = prepSerializers(4096)
-        @Suppress("UNCHECKED_CAST")
-        json.listValue(value as List<Any>, ValueWriterImpl(registry, json), registry.requireListTypeHandlerFor(value.findListType()) as ListTypeDefinition<Any>)
-        return out.toString()
-      }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    return when (value) {
-      null -> {
-        val out = StringWriter(256)
-        val json = JsonWriter(out)
-
-        when (handler) {
-          is SimpleTypeDefinition<*, *> ->
-            json.serializeSimpleNull(handler as SimpleTypeDefinition<*, Any>)
-
-          is ComplexTypeDefinition<*> ->
-            json.serializeComplexNull(handler as ComplexTypeDefinition<Any>, ValueWriterImpl(registry, json))
-
-          is ListTypeDefinition<*> -> throw IllegalStateException()
-        }
-
-        out
-      }
-
-      else -> {
-        val out = StringWriter(4096)
-        val json = JsonWriter(out)
-
-        when (handler) {
-          is SimpleTypeDefinition<*, *>
-            -> json.serializeSimple(value, handler as SimpleTypeDefinition<*, Any>)
-
-          is ComplexTypeDefinition<*>
-            -> json.complexValue(value, ValueWriterImpl(registry, json), handler as ComplexTypeDefinition<Any>)
-
-          is ListTypeDefinition<*> -> throw IllegalStateException()
-        }
-
-        out
-      }
-    }.toString()
   }
 
-  private fun JsonWriter.serializeSimple(value: Any, handler: SimpleTypeDefinition<*, Any>) {
-    withType(handler) {
-      if (it is RawTypeSerializer<*>) {
-        @Suppress("UNCHECKED_CAST")
-        jsonValue((it as RawTypeSerializer<Any>).serializeToRaw(value))
-        return
-      }
+  @OptIn(ExperimentalEncodingApi::class)
+  fun <T : Any> deserializeAs(value: String, type: Class<T>): T =
+    deserializeAs(Base64.decode(value), type)
 
-      when (val rendered = it.serialize(value)) {
-        null -> nullValue()
-        else -> requireWriter(rendered, handler.actualType)(rendered)
-      }
-    }
+  fun <T : Any> deserializeAs(value: ByteArray, type: Class<T>): T {
+
   }
 
-  private fun JsonWriter.serializeComplexNull(handler: ComplexTypeDefinition<Any>, writer: ValueWriter) {
-    withType(handler) { it.serializeNull(writer) }
+  private fun serializeInstance(value: Any): ByteArray {
+    val codecs =
   }
 
-  private fun JsonWriter.serializeSimpleNull(handler: SimpleTypeDefinition<*, Any>) {
-    withType(handler) {
-      when (val rendered = it.serializeNull()) {
-        null -> nullValue()
-        else -> requireWriter(rendered, it.actualType)(rendered)
-      }
-    }
-  }
-
-  // endregion Serialization
-
-  // region Deserialization
-
-  fun deserialize(value: String): Any? {
-    val source = Interpreter(value.reader())
-    if (!source.hasNext())
-      return null
-
-    return when (source.next()) {
-      is TypeStartEvent -> source.deserializeComplex()
-      else -> throw IllegalStateException()
-    }
-  }
-
-  private fun Interpreter.deserializeComplex(): Any {
-    val header = next().takeAs<HeaderEvent>() ?: throw IllegalStateException()
-    val handler = registry.requireTypeDefinitionFor(header.typeIndicator)
-
-    val deserializer = handler.deserializerFor(header.version)
-      as ComplexDeserializer?
-      ?: throw InvalidThimbleValueException("type handler for type" +
-        " ${header.typeIndicator} does not support values of version" +
-        " ${header.version}")
-
-    var index = 0
-    while (hasNext()) {
-      when (val n = next()) {
-        is BooleanEvent -> deserializer.append(index++, BooleanAccessor(n.value))
-        is NullEvent -> deserializer.append(index++, NullAccessor())
-        is NumberEvent -> deserializer.append(index++, NumberAccessor(n.rawValue))
-        is StringEvent -> deserializer.append(index++, StringAccessor(n.value))
-        is TypeStartEvent -> deserializer.append(index++, ComplexTypeAccessor(deserializeComplex()))
-        is TypeEndEvent -> break
-
-        is HeaderEvent -> throw IllegalStateException()
-      }
-    }
-
-    return deserializer.build()
-  }
-
-  // endregion Deserialization
+  private fun serializePrimitive(value: Any): ByteArray =
+    when (value) {
+      is Int     -> ByteArrayOutputStream(5).also { IntCodec.encode(it, value) }
+      is Boolean -> ByteArrayOutputStream(2).also { BooleanCodec.encode(it, value) }
+      is Double  -> ByteArrayOutputStream(9).also { DoubleCodec.encode(it, value) }
+      is Float   -> ByteArrayOutputStream(5).also { FloatCodec.encode(it, value) }
+      is Long    -> ByteArrayOutputStream(9).also { LongCodec.encode(it, value) }
+      is Byte    -> ByteArrayOutputStream(2).also { ByteCodec.encode(it, value) }
+      is Short   -> ByteArrayOutputStream(3).also { ShortCodec.encode(it, value) }
+      is Char    -> ByteArrayOutputStream(3).also { ShortCodec.encode(it, value.code.toShort()) }
+      else       -> throw IllegalStateException()
+    }.toByteArray()
 }
