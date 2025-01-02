@@ -1,9 +1,9 @@
 package io.foxcapades.mc.bukkit.thimble.codecs
 
-import java.io.InputStream
 import java.io.OutputStream
+import java.nio.ByteBuffer
 
-interface DictionaryCodec<K : Any, V : Any, M : Map<K, V>> : U8VersionedCodec<M> {
+interface DictionaryCodec<K, V, M: Map<K, V>>: U8VersionedCodec<M> {
   val keyCodec: Codec<K>
 
   val valueCodec: Codec<V>
@@ -14,13 +14,14 @@ interface DictionaryCodec<K : Any, V : Any, M : Map<K, V>> : U8VersionedCodec<M>
     valueCodec.encodeHeader(into)
   }
 
-  override val headerLength: UInt
+  override val headerLength: Int
     get() = super.headerLength +
       keyCodec.headerLength +
       valueCodec.headerLength
 
-  override fun validateAndSkipHeader(from: InputStream, offset: UInt) =
-    super.validateAndSkipHeader(from, offset) +
-      keyCodec.validateAndSkipHeader(from, 0u) +
-      valueCodec.validateAndSkipHeader(from, 0u)
+  override fun validateAndSkipHeader(from: ByteBuffer) {
+    super.validateAndSkipHeader(from)
+    keyCodec.validateAndSkipHeader(from)
+    valueCodec.validateAndSkipHeader(from)
+  }
 }

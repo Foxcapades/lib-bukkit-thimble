@@ -1,44 +1,37 @@
-package io.foxcapades.mc.bukkit.thimble.types
+package io.foxcapades.mc.bukkit.thimble
 
-enum class DataType {
-  Null,
-  Boolean,
-  Byte,
-  Short,
-  Int,
-  Long,
-  Float,
-  Double,
-  String,
-  BigInteger,
-  BigDecimal,
-  Sequence,
-  Dictionary,
-  Bukkit,
-  Complex,
-  Compound,
-  Unknown,
-  ;
+import io.foxcapades.mc.bukkit.thimble.utils.exert
+import kotlin.experimental.and
 
-  val isNull
-    get() = this == Null
 
-  val isPrimitive
-    get() = ordinal in Boolean.ordinal .. Double.ordinal
+@JvmInline
+value class DataType private constructor(val rawValue: Byte) {
+  inline val kind get() = DataKind.entries[(rawValue and 3).toInt()]
 
-  val identifier
-    get() = ordinal.toUByte()
+  inline val scalarType get() = exert(kind == DataKind.Scalar) { ScalarType.entries[rawValue.toInt() shl 2] }
+
+  inline val recordType get() = exert(kind == DataKind.Record) { RecordType.entries[rawValue.toInt() shl 2] }
+
+  inline val isScalar get() = kind == DataKind.Scalar
+
+  inline val isRecord get() = kind == DataKind.Record
+
+  inline val isUnknown get() = kind == DataKind.Unknown
+
+  override fun toString() =
+    when (kind) {
+      DataKind.Scalar -> "Scalar:$scalarType"
+      DataKind.Record -> "Record:$recordType"
+      else -> "Unknown"
+    }
 
   companion object {
-    @JvmStatic
-    fun fromTag(tag: UByte): DataType =
-      fromTagOrNull(tag) ?: throw IllegalArgumentException("unrecognized type tag: $tag")
+    fun Scalar(type: ScalarType) = DataType(type.ordinal.shr(2).and(DataKind.Scalar.ordinal).toByte())
 
-    @JvmStatic
-    fun fromTagOrNull(tag: UByte): DataType? =
-      when (tag) {
-        in Null.identifier .. Unknown.identifier -> entries[tag.toInt()]
-        else -> null
-      }
+    fun Record(type: RecordType) = DataType(type.ordinal.shr(2).and(DataKind.Record.ordinal).toByte())
+
+    inline val Unknown get() = DataType.ofRaw(DataKind.Unknown.ordinal.toByte())
+
+    fun ofRaw(raw: Byte) = DataType(raw)
   }
 }

@@ -1,12 +1,12 @@
 package io.foxcapades.mc.bukkit.thimble.codecs
 
-import io.foxcapades.mc.bukkit.thimble.ThimbleDeserializationException
-import java.io.InputStream
+import io.foxcapades.mc.bukkit.thimble.io.mustGetByte
 import java.io.OutputStream
+import java.nio.ByteBuffer
 
 sealed interface U8CodecVersion : CodecVersion {
-  override val length: UInt
-    get() = 1u
+  override val length: Int
+    get() = 1
 
   val value: UByte
 
@@ -14,14 +14,14 @@ sealed interface U8CodecVersion : CodecVersion {
 
   companion object {
     @JvmStatic
-    fun readFrom(from: InputStream): U8CodecVersion =
-      U8CodecVersionImpl(when (val b = from.read()) {
-        -1   -> throw ThimbleDeserializationException("unexpected EOF while reading codec version")
-        else -> b.toUByte()
-      })
+    fun readFrom(from: ByteBuffer): U8CodecVersion =
+      U8CodecVersionImpl(from.mustGetByte().toUByte())
 
     @JvmStatic
     fun of(value: UByte): U8CodecVersion = U8CodecVersionImpl(value)
+
+    @JvmStatic
+    fun of(value: Int): U8CodecVersion = U8CodecVersionImpl(value.toUByte())
   }
 }
 

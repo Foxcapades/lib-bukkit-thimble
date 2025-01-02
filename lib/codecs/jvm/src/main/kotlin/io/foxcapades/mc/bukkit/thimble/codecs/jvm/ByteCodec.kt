@@ -1,19 +1,23 @@
 package io.foxcapades.mc.bukkit.thimble.codecs.jvm
 
 import io.foxcapades.mc.bukkit.thimble.codecs.UnversionedCodec
-import io.foxcapades.mc.bukkit.thimble.types.DataType
-import io.foxcapades.mc.bukkit.thimble.io.writeI8
-import io.foxcapades.mc.bukkit.thimble.io.readI8
-import java.io.InputStream
+import io.foxcapades.mc.bukkit.thimble.DataType
+import io.foxcapades.mc.bukkit.thimble.ScalarType
+import io.foxcapades.mc.bukkit.thimble.io.mustGetByte
 import java.io.OutputStream
+import java.nio.ByteBuffer
 
 object ByteCodec : UnversionedCodec<Byte> {
-  override val dataType get() = DataType.Byte
+
+  override val dataType: DataType
+    get() = DataType.Scalar(ScalarType.Byte)
 
   override val javaType: Class<out Byte>
     get() = Byte::class.java
 
-  override fun decodeBody(from: InputStream, into: Byte) {}
-  override fun encodeBody(into: OutputStream, value: Byte) = into.writeI8(value)
-  override fun create(from: InputStream) = from.readI8()
+  override fun encodeBody(into: OutputStream, value: Byte) =
+    into.write(value.toInt())
+
+  override fun create(from: ByteBuffer) =
+    from.mustGetByte()
 }

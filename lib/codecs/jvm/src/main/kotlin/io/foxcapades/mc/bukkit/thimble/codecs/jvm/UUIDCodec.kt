@@ -1,11 +1,12 @@
 package io.foxcapades.mc.bukkit.thimble.codecs.jvm
 
 import io.foxcapades.mc.bukkit.thimble.codecs.UnversionedCodec
-import io.foxcapades.mc.bukkit.thimble.io.readI64
-import io.foxcapades.mc.bukkit.thimble.io.writeI64
-import io.foxcapades.mc.bukkit.thimble.types.DataType
-import java.io.InputStream
+import io.foxcapades.mc.bukkit.thimble.DataType
+import io.foxcapades.mc.bukkit.thimble.RecordType
+import io.foxcapades.mc.bukkit.thimble.io.mustGetLong
+import io.foxcapades.mc.bukkit.thimble.utils.writeLong
 import java.io.OutputStream
+import java.nio.ByteBuffer
 import java.util.UUID
 
 object UUIDCodec : UnversionedCodec<UUID> {
@@ -13,14 +14,14 @@ object UUIDCodec : UnversionedCodec<UUID> {
     get() = UUID::class.java
 
   override val dataType: DataType
-    get() = DataType.Sequence
+    get() = DataType.Record(RecordType.Sequence)
 
-  override fun create(from: InputStream): UUID {
-    return UUID(from.readI64(), from.readI64())
+  override fun create(from: ByteBuffer): UUID {
+    return UUID(from.mustGetLong(), from.mustGetLong())
   }
 
   override fun encodeBody(into: OutputStream, value: UUID) {
-    into.writeI64(value.mostSignificantBits)
-    into.writeI64(value.leastSignificantBits)
+    into.writeLong(value.mostSignificantBits)
+    into.writeLong(value.leastSignificantBits)
   }
 }

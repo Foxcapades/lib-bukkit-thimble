@@ -1,12 +1,12 @@
 package io.foxcapades.mc.bukkit.thimble.codecs
 
-import java.io.InputStream
 import java.io.OutputStream
+import java.nio.ByteBuffer
 
-interface SequenceCodec<T : Any, C : Any> : U8VersionedCodec<C> {
+interface SequenceCodec<T, C: Any> : U8VersionedCodec<C> {
   val valueCodec: Codec<T>
 
-  override val headerLength: UInt
+  override val headerLength
     get() = super.headerLength + valueCodec.headerLength
 
   override fun encodeHeader(into: OutputStream) {
@@ -14,8 +14,9 @@ interface SequenceCodec<T : Any, C : Any> : U8VersionedCodec<C> {
     valueCodec.encodeHeader(into)
   }
 
-  override fun validateAndSkipHeader(from: InputStream, offset: UInt): UInt =
-    super.validateAndSkipHeader(from, offset) +
-      valueCodec.validateAndSkipHeader(from, 0u)
+  override fun validateAndSkipHeader(from: ByteBuffer) {
+    super.validateAndSkipHeader(from)
+    valueCodec.validateAndSkipHeader(from)
+  }
 }
 

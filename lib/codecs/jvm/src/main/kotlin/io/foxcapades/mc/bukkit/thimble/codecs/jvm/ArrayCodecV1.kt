@@ -1,35 +1,50 @@
 package io.foxcapades.mc.bukkit.thimble.codecs.jvm
 
+import io.foxcapades.mc.bukkit.thimble.DataType
+import io.foxcapades.mc.bukkit.thimble.RecordType
+import io.foxcapades.mc.bukkit.thimble.ThimbleSerializationException
 import io.foxcapades.mc.bukkit.thimble.codecs.Codec
 import io.foxcapades.mc.bukkit.thimble.codecs.SequenceCodec
 import io.foxcapades.mc.bukkit.thimble.codecs.U8CodecVersion
-import io.foxcapades.mc.bukkit.thimble.types.DataType
-import io.foxcapades.mc.bukkit.thimble.io.readU16I
-import io.foxcapades.mc.bukkit.thimble.io.writeU16
-import java.io.InputStream
+import io.foxcapades.mc.bukkit.thimble.io.mustGetShort
+import io.foxcapades.mc.bukkit.thimble.utils.writeShort
 import java.io.OutputStream
+import java.nio.ByteBuffer
 
-@JvmInline
-value class ArrayCodecV1<T : Any>(override val valueCodec: Codec<T>) : SequenceCodec<T, Array<T>> {
-  override val dataType
-    get() = DataType.Sequence
+class ArrayCodecV1<T>(override val valueCodec: Codec<T>) : SequenceCodec<T, Array<T>> {
+  override val dataType: DataType
+    get() = DataType.Record(RecordType.Sequence)
 
-  override val version
+  @Suppress("UNCHECKED_CAST")
+  override val javaType: Class<out Array<T>>
+    get() = Array::class.java as Class<Array<T>>
+
+  override val version: U8CodecVersion
     get() = U8CodecVersion.of(1u)
 
   override fun encodeBody(into: OutputStream, value: Array<T>) {
-    into.writeU16(requireValidSize(value.size))
-    value.forEach { valueCodec.encodeBody(into, it) }
+    into.writeShort(checkLength(value.size))
+    if (valueCodec.dataType == DataType.Unknown) {
+      value.forEach { valueCodec.encode(into, it) }
+    } else {
+      value.forEach { valueCodec.encodeBody(into, it) }
+    }
   }
 
   @Suppress("UNCHECKED_CAST")
-  override fun create(from: InputStream): Array<T> =
-    Array<Any?>(from.readU16I()) { valueCodec.create(from) } as Array<T>
+  override fun create(from: ByteBuffer): Array<T> =
+    (if (valueCodec.dataType == DataType.Unknown)
+      Array<Any?>(from.getSize()) { valueCodec.create(from).also { valueCodec.decodeBody(from, it) } }
+    else
+      Array<Any?>(from.getSize()) { valueCodec.decode(from) }) as Array<T>
 
-  private fun requireValidSize(size: Int): Int {
+  private fun checkLength(size: Int): Short =
     if (size > 0xFFFF)
-      throw IllegalArgumentException("sequence is too long to be written as a single value; length must be <= 65535")
+      throw ThimbleSerializationException("cannot serialize a sequence with more than ${0xFFFF} values")
+    else
+      size.toShort()
 
-    return size
-  }
+  @Suppress("NOTHING_TO_INLINE")
+  private inline fun ByteBuffer.getSize(): Int =
+    mustGetShort().toInt().and(0xFFFF)
 }

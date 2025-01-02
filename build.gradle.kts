@@ -35,7 +35,7 @@ dependencies {
   compileOnly(libs.spigot.api.v1x21x3)
 
   implementation(project(":jvm-codecs"))
-  implementation(project(":unsafe-1.21.3"))
+  implementation(project(":bukkit-codecs"))
 
   testImplementation(libs.spigot.api.v1x21x3)
   testImplementation("org.junit.jupiter:junit-jupiter:5.11.3")

@@ -1,14 +1,23 @@
 package io.foxcapades.mc.bukkit.thimble.codecs.jvm
 
 import io.foxcapades.mc.bukkit.thimble.codecs.UnversionedCodec
-import io.foxcapades.mc.bukkit.thimble.types.DataType
-import io.foxcapades.mc.bukkit.thimble.io.BasicIO.readI64
-import io.foxcapades.mc.bukkit.thimble.io.BasicIO.writeI64
-import java.io.InputStream
+import io.foxcapades.mc.bukkit.thimble.DataType
+import io.foxcapades.mc.bukkit.thimble.ScalarType
+import io.foxcapades.mc.bukkit.thimble.io.mustGetLong
+import io.foxcapades.mc.bukkit.thimble.utils.writeLong
 import java.io.OutputStream
+import java.nio.ByteBuffer
 
 object DoubleCodec : UnversionedCodec<Double> {
-  override val dataType get() = DataType.Double
-  override fun encodeBody(into: OutputStream, value: Double) = into.writeI64(value.toRawBits())
-  override fun create(from: InputStream) = Double.fromBits(from.readI64())
+  override val dataType: DataType
+    get() = DataType.Scalar(ScalarType.Double)
+
+  override val javaType: Class<Double>
+    get() = Double::class.java
+
+  override fun encodeBody(into: OutputStream, value: Double) =
+    into.writeLong(value.toRawBits())
+
+  override fun create(from: ByteBuffer) =
+    Double.fromBits(from.mustGetLong())
 }

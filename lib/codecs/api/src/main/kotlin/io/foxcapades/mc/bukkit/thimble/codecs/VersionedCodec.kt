@@ -1,15 +1,15 @@
 package io.foxcapades.mc.bukkit.thimble.codecs
 
 import io.foxcapades.mc.bukkit.thimble.ThimbleDeserializationException
-import java.io.InputStream
 import java.io.OutputStream
+import java.nio.ByteBuffer
 
-interface VersionedCodec<T : Any, V : CodecVersion> : Codec<T> {
+interface VersionedCodec<T, V: CodecVersion> : Codec<T> {
   val version: V
 
-  val versionCodec: (InputStream) -> V
+  val versionCodec: (ByteBuffer) -> V
 
-  override val headerLength: UInt
+  override val headerLength: Int
     get() = super.headerLength + version.length
 
   override fun encodeHeader(into: OutputStream) {
@@ -17,19 +17,14 @@ interface VersionedCodec<T : Any, V : CodecVersion> : Codec<T> {
     version.writeTo(into)
   }
 
-  override fun validateAndSkipHeader(from: InputStream, offset: UInt): UInt {
-    val off = super.validateAndSkipHeader(from, offset)
+  override fun validateAndSkipHeader(from: ByteBuffer) {
+    super.validateAndSkipHeader(from)
 
-    if (off == super.headerLength) {
+    if (from.position() == super.headerLength) {
       when (val tv = versionCodec(from)) {
         version -> { /* yup */ }
         else -> throw ThimbleDeserializationException("expected version $version, got $tv")
       }
-
-      return super.headerLength + version.length
     }
-
-    return off
   }
 }
-

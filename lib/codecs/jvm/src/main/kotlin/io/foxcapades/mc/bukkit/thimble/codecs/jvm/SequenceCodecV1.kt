@@ -2,27 +2,35 @@ package io.foxcapades.mc.bukkit.thimble.codecs.jvm
 
 import io.foxcapades.mc.bukkit.thimble.codecs.SequenceCodec
 import io.foxcapades.mc.bukkit.thimble.codecs.U8CodecVersion
-import io.foxcapades.mc.bukkit.thimble.types.DataType
-import java.io.InputStream
+import io.foxcapades.mc.bukkit.thimble.DataType
+import io.foxcapades.mc.bukkit.thimble.RecordType
+import io.foxcapades.mc.bukkit.thimble.io.mustGetShort
+import io.foxcapades.mc.bukkit.thimble.utils.writeShort
 import java.io.OutputStream
+import java.nio.ByteBuffer
 
-abstract class SequenceCodecV1<T : Any, C : Collection<T>> : SequenceCodec<T, C> {
-  override val dataType
-    get() = DataType.Sequence
+abstract class SequenceCodecV1<T, C: Collection<T>> : SequenceCodec<T, C> {
+  override val dataType: DataType
+    get() = DataType.Record(RecordType.Sequence)
 
-  override val version
+  override val version: U8CodecVersion
     get() = U8CodecVersion.of(1u)
 
   override fun encodeBody(into: OutputStream, value: C) {
-    ShortCodec.encodeBody(into, requireValidSize(value.size))
+    into.writeShort(requireValidSize(value.size))
     value.forEach { valueCodec.encodeBody(into, it) }
   }
 
-  override fun create(from: InputStream): C =
+  override fun create(from: ByteBuffer): C =
     @Suppress("UNCHECKED_CAST")
-    newCollection(ShortCodec.create(from).toInt()).also { (it as MutableCollection<T>).apply {
-      for (i in indices)
-        add(valueCodec.create(from).also { valueCodec.decodeBody(from, it) })
+    newCollection(from.mustGetShort().toInt().and(0xFFFF)).also { (it as MutableCollection<T>).apply {
+      if (valueCodec.dataType == DataType.Unknown) {
+        for (i in indices)
+          add(valueCodec.decode(from))
+      } else {
+        for (i in indices)
+          add(valueCodec.create(from).also { valueCodec.decodeBody(from, it) })
+      }
     } }
 
   protected abstract fun newCollection(size: Int): C

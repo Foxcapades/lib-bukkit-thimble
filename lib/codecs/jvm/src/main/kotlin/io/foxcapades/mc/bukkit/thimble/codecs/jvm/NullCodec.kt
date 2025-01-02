@@ -1,16 +1,22 @@
 package io.foxcapades.mc.bukkit.thimble.codecs.jvm
 
 import io.foxcapades.mc.bukkit.thimble.codecs.UnversionedCodec
-import io.foxcapades.mc.bukkit.thimble.types.DataType
-import java.io.InputStream
+import io.foxcapades.mc.bukkit.thimble.DataType
+import io.foxcapades.mc.bukkit.thimble.ScalarType
 import java.io.OutputStream
+import java.nio.ByteBuffer
 
 object NullCodec : UnversionedCodec<Any?> {
-  override val dataType get() = DataType.Null
-  override val javaType get() = Any::class.java
+  override val dataType: DataType
+    get() = DataType.Scalar(ScalarType.Null)
 
-  fun encode(into: OutputStream) = encode(into, null)
+  override val javaType: Class<Any>
+    get() = Any::class.java
+
+  fun encode(into: OutputStream) =
+    encode(into, null)
 
   override fun encodeBody(into: OutputStream, value: Any?) {}
-  override fun create(from: InputStream): Any? = null
+
+  override fun create(from: ByteBuffer): Any? = null
 }

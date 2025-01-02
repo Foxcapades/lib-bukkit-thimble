@@ -3,7 +3,7 @@ package io.foxcapades.mc.bukkit.thimble.codecs
 import java.io.OutputStream
 
 interface CodecVersion {
-  val length: UInt
+  val length: Int
 
   fun writeTo(into: OutputStream)
 }

@@ -1,8 +1,8 @@
 package io.foxcapades.mc.bukkit.thimble.codecs
 
-import java.io.InputStream
+import java.nio.ByteBuffer
 
-interface U8VersionedCodec<T : Any> : VersionedCodec<T, U8CodecVersion> {
-  override val versionCodec: (InputStream) -> U8CodecVersion
+interface U8VersionedCodec<T> : VersionedCodec<T, U8CodecVersion> {
+  override val versionCodec: (ByteBuffer) -> U8CodecVersion
     get() = U8CodecVersion.Companion::readFrom
 }
